@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+    .detail-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 2rem;
+    }
+    
+    @media (max-width: 992px) {
+        .detail-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Gallery Section */
+    .gallery-container {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .primary-display {
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f1f5f9;
+        position: relative;
+    }
+    
+    .primary-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .thumbnail-list {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem;
+        overflow-x: auto;
+        border-top: 1px solid var(--border-color);
+        background: white;
+    }
+    
+    .thumbnail-item {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-sm);
+        border: 2px solid transparent;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: var(--transition-fast);
+        flex-shrink: 0;
+    }
+    
+    .thumbnail-item:hover, .thumbnail-item.active {
+        opacity: 1;
+        border-color: var(--primary);
+    }
+    
+    .thumbnail-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Map Section */
+    #detail-map {
+        height: 300px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        margin-top: 1rem;
+        z-index: 1;
+    }
+    
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0;
+    }
+    
+    .info-list-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .info-list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--primary-light);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('items.search') }}" class="text-muted"><i class="fas fa-arrow-left me-2"></i>Back to Browse</a>
+</div>
+
+<div class="detail-layout">
+    <!-- Left Column: Media & Description -->
+    <div class="content-main">
+        <!-- Image Gallery -->
+        <div class="gallery-container">
+            <div class="primary-display">
+                {% if images %}
+                    <img src="{{ images[0].image_url }}" alt="{{ item.title }}" id="mainGalleryImg">
+                {% else %}
+                    <div class="text-muted text-center">
+                        <i class="fas fa-image fa-4x mb-2" style="opacity: 0.2;"></i>
+                        <p class="mb-0">No images provided for this report.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if images and images|length > 1 %}
+            <div class="thumbnail-list">
+                {% for img in images %}
+                <div class="thumbnail-item {% if loop.first %}active{% endif %}" onclick="changeMainImage('{{ img.image_url }}', this)">
+                    <img src="{{ img.image_url }}" alt="Thumbnail">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Description Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Item Description</h3>
+            </div>
+            <div class="card-body">
+                <p style="white-space: pre-line; font-size: 1.05rem; line-height: 1.7;">{{ item.description }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Metadata & Location Map -->
+    <div class="content-sidebar">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge badge-primary uppercase">{{ item.category_name }}</span>
+                    <span class="badge {% if item.type == 'lost' %}badge-warning{% else %}badge-success{% endif %} uppercase">{{ item.type | upper }}</span>
+                </div>
+                
+                <h1 style="font-size: 2rem; line-height: 1.2; margin-bottom: 1rem;">{{ item.title }}</h1>
+                
+                {% if item.status == 'resolved' %}
+                <div class="alert alert-success d-flex align-items-center gap-2 alert-permanent">
+                    <i class="fas fa-check-circle"></i>
+                    <div>This report is closed and resolved.</div>
+                </div>
+                {% endif %}
+                
+                <ul class="info-list">
+                    <li class="info-list-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Location</small>
+                            <strong>{{ item.location_text }}</strong>
+                        </div>
+                    </li>
+                    
+                    {% if item.incident_date %}
+                    <li class="info-list-item">
+                        <div class="info-icon">
+                            <i class="far fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Date {% if item.type == 'lost' %}Lost{% else %}Found{% endif %}</small>
+                            <strong>{{ item.incident_date }}</strong>
+                        </div>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="info-list-item">
+                        <div class="info-icon">
+                            <i class="far fa-user"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Reported By</small>
+                            <strong>{{ item.first_name }}</strong>
+                            <span class="text-small text-muted">(Member since {{ item.user_joined.strftime('%Y') if item.user_joined else '2026' }})</span>
+                        </div>
+                    </li>
+                    
+                    <li class="info-list-item">
+                        <div class="info-icon">
+                            <i class="far fa-eye"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Views</small>
+                            <strong>{{ item.view_count }} views</strong>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- Action Buttons -->
+                <div class="mt-4 pt-3 border-top d-grid gap-2">
+                    {% if current_user and current_user.id == item.user_id %}
+                        <!-- Owner controls -->
+                        <a href="{{ url_for('my_posts') }}" class="btn btn-outline-primary"><i class="fas fa-tasks me-1"></i> Manage My Posts</a>
+                    {% else %}
+                        <!-- Normal user controls -->
+                        {% if item.status == 'open' %}
+                            <a href="{{ url_for('chat.start_chat', item_id=item.id) }}" class="btn btn-primary btn-large btn-block shadow-md">
+                                <i class="far fa-comments"></i> Message Reporter
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Location Map Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3>Incident Location</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-small text-muted mb-2"><i class="fas fa-info-circle me-1"></i> Exact coordinate location on campus grid.</p>
+                <div id="detail-map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE=" crossorigin=""></script>
+<script>
+    // Thumbnail Swapper
+    function changeMainImage(url, element) {
+        document.getElementById('mainGalleryImg').src = url;
+        document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+
+    // Leaflet Integration for Detail View
+    document.addEventListener('DOMContentLoaded', () => {
+        const mapContainer = document.getElementById('detail-map');
+        const lat = parseFloat("{{ item.lat if item.lat else '' }}");
+        const lng = parseFloat("{{ item.lng if item.lng else '' }}");
+
+        if (mapContainer && !isNaN(lat) && !isNaN(lng)) {
+            const map = L.map('detail-map', {
+                center: [lat, lng],
+                zoom: 16,
+                zoomControl: true,
+                scrollWheelZoom: false
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const pinIcon = L.divIcon({
+                className: '',
+                html: `
+                    <div style="
+                        width: 30px; height: 30px;
+                        background: #1251e6;
+                        border: 2px solid white;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        box-shadow: 0 2px 8px rgba(18,81,230,0.3);
+                    "></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            });
+
+            L.marker([lat, lng], { icon: pinIcon }).addTo(map)
+             .bindPopup("<b>{{ item.title }}</b><br>{{ item.location_text }}").openPopup();
+        } else {
+            mapContainer.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-map-marked fa-3x mb-2" style="opacity: 0.2"></i>
+                    <p class="mb-0">No coordinates provided.</p>
+                </div>
+            `;
+            mapContainer.style.background = '#f8fafc';
+        }
+    });
+</script>
+{% endblock %}

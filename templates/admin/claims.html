@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Manage Claims - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin.items') }}"><i class="fas fa-box-open"></i> Items</a>
+            <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.claims') }}" class="active"><i class="fas fa-handshake"></i> Claims</a>
+            <a href="{{ url_for('admin.settings') }}"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <header class="admin-content-header">
+            <h2>Manage Claims</h2>
+        </header>
+
+        <section class="admin-data-section">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Item</th>
+                        <th>Claimant</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for claim in claims %}
+                    <tr>
+                        <td>{{ claim.id }}</td>
+                        <td>
+                            <a href="{{ url_for('items.item_detail', item_id=claim.item_id) }}" target="_blank">
+                                {{ claim.item_title }}
+                            </a>
+                        </td>
+                        <td>{{ claim.claimant_email }}</td>
+                        <td>
+                            {% set badge_class = 'warning' %}
+                            {% if claim.status == 'approved' %}
+                                {% set badge_class = 'success' %}
+                            {% elif claim.status == 'rejected' %}
+                                {% set badge_class = 'danger' %}
+                            {% endif %}
+                            <span class="badge badge-{{ badge_class }}">{{ claim.status|title }}</span>
+                        </td>
+                        <td>{{ claim.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No claims found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

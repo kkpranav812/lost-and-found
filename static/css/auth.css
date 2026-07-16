@@ -1,0 +1,284 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ * auth.css
+ * Stylesheet for Authentication and Account pages (Login, Register, etc.)
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/* Body Styles */
+.auth-body {
+    background-color: #f8fafc;
+    font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Centered Form Layout Container */
+.auth-container-centered {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+}
+
+/* Card Styling */
+.auth-card {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+    padding: 3rem 2.5rem 0;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #eef2f6;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06), 0 3px 8px rgba(15, 23, 42, 0.02);
+}
+
+.auth-form-container h2 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+}
+
+.auth-form-container .subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+/* Form Styling & Inputs */
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-icon-wrapper i:not(.fa-eye):not(.fa-eye-slash) {
+    position: absolute;
+    left: 1.15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: #1251e6; /* Branding Blue */
+    transition: color 0.2s ease;
+    pointer-events: none;
+}
+
+.mockup-input .form-control {
+    width: 100%;
+    padding: 1rem 1.25rem 1rem 3.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    color: #0f172a;
+    background-color: #fcfdfe;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.mockup-input .form-control:focus {
+    border-color: #1251e6;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(18, 81, 230, 0.08);
+}
+
+.mockup-input .form-control::placeholder {
+    color: #94a3b8;
+}
+
+/* Password Toggle Eye Button */
+.password-toggle {
+    position: absolute;
+    right: 1.15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #1251e6;
+}
+
+/* Links & Utilities */
+.forgot-link {
+    font-size: 0.85rem;
+    color: #1251e6;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+    opacity: 0.9;
+}
+
+/* Primary Button Styling */
+.btn-block {
+    width: 100%;
+}
+
+.btn-large {
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #1251e6;
+    border-color: #1251e6;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background-color: #0d40bf;
+    border-color: #0d40bf;
+    box-shadow: 0 4px 12px rgba(18, 81, 230, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Landscape footer within the card context */
+.auth-card-footer-img {
+    margin-top: 1.5rem;
+    width: calc(100% + 5rem);
+    margin-left: -2.5rem;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+}
+
+.auth-card-footer-img img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* Alerts CSS Animation */
+.alert {
+    padding: 0.85rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    border-color: #fee2e2;
+    color: #991b1b;
+}
+
+.alert-success {
+    background-color: #f0fdf4;
+    border-color: #dcfce7;
+    color: #166534;
+}
+
+.alert-info {
+    background-color: #f0f9ff;
+    border-color: #e0f2fe;
+    color: #075985;
+}
+
+.alert-warning {
+    background-color: #fffbeb;
+    border-color: #fef3c7;
+    color: #92400e;
+}
+
+/* Animation utilities */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+/* Social links and styling */
+.social-login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 1.5rem 0;
+}
+
+.social-login-divider::before,
+.social-login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.social-login-divider span {
+    padding: 0 0.75rem;
+}
+
+.btn-social {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-social:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    cursor: pointer;
+}
+
+.social-icon-img {
+    width: 1.25rem;
+    height: 1.25rem;
+}

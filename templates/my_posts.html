@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}My Posts{% endblock %}
+
+{% block extra_css %}
+<style>
+    .posts-tabs {
+        display: flex;
+        border-bottom: 2px solid var(--border-color);
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .tab-button {
+        background: none;
+        border: none;
+        padding: 0.75rem 0.5rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: var(--transition-fast);
+    }
+    
+    .tab-button:hover {
+        color: var(--primary);
+    }
+    
+    .tab-button.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+    .my-posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* Actions Panel for My Posts card overlay */
+    .post-wrapper {
+        position: relative;
+    }
+    
+    .post-actions-overlay {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        padding: 0 1rem 1rem;
+    }
+
+    .post-actions-overlay button, .post-actions-overlay a {
+        flex: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="mb-1">My Reports & Posts</h1>
+        <p class="text-muted mb-0">Manage items you have lost or found on campus.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('items.report_lost') }}" class="btn btn-outline-primary"><i class="fas fa-bullhorn"></i> Report Lost</a>
+        <a href="{{ url_for('items.report_found') }}" class="btn btn-primary"><i class="fas fa-box-open"></i> Report Found</a>
+    </div>
+</div>
+
+<!-- Tabs for Filter -->
+<div class="posts-tabs">
+    <button class="tab-button active" data-filter="all">All Posts ({{ items|length }})</button>
+    <button class="tab-button" data-filter="open">Active Reports ({{ items | selectattr('status', 'equalto', 'open') | list | length }})</button>
+    <button class="tab-button" data-filter="resolved">Resolved Items ({{ items | selectattr('status', 'equalto', 'resolved') | list | length }})</button>
+</div>
+
+{% if items %}
+<div class="my-posts-grid" id="myPostsGrid">
+    {% for item in items %}
+    <div class="post-wrapper card" data-item-id="{{ item.id }}" data-status="{{ item.status }}">
+        
+        <!-- Reuse Card component, but clean card border so we wrap it inside post-wrapper -->
+        {% include "components/item_card.html" %}
+        
+        <!-- Post Control Actions -->
+        <div class="post-actions-overlay">
+            {% if item.status == 'open' %}
+            <form action="{{ url_for('items.resolve_item', item_id=item.id) }}" method="POST" class="d-inline flex-grow-1">
+                <button type="submit" class="btn btn-outline-primary btn-sm btn-block resolve-btn">
+                    <i class="fas fa-check-circle me-1"></i> Resolve
+                </button>
+            </form>
+            {% endif %}
+            
+            <form action="{{ url_for('items.delete_item', item_id=item.id) }}" method="POST" class="d-inline flex-grow-1 delete-form">
+                <button type="button" class="btn btn-light btn-sm btn-block text-danger delete-btn">
+                    <i class="fas fa-trash-alt me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="card text-center py-5">
+    <div class="card-body">
+        <div class="mb-4 text-muted" style="font-size: 4rem; opacity: 0.2;">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No posts found</h3>
+        <p class="text-muted">You haven't reported any lost or found items yet.</p>
+        <div class="mt-4 d-flex justify-content-center gap-2">
+            <a href="{{ url_for('items.report_lost') }}" class="btn btn-primary">Report Lost Item</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/my-posts.js') }}"></script>
+{% endblock %}

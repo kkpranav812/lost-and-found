@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="mb-1">Welcome back, {{ current_user.first_name }}! 👋</h1>
+            <p class="text-muted mb-0">Here's what's happening with your items and community today.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('items.report_lost') }}" class="btn btn-outline-primary">
+                <i class="fas fa-bullhorn"></i> Report Lost
+            </a>
+            <a href="{{ url_for('items.report_found') }}" class="btn btn-primary">
+                <i class="fas fa-box-open"></i> Report Found
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 8 Stat Cards Grid -->
+<div class="stats-grid mb-5">
+    <!-- Row 1: Global/Community Stats -->
+    <div class="stat-card">
+        <div class="stat-icon bg-primary-light text-primary">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Total Lost Items</p>
+            <h3 class="stat-value">{{ stats.reported_items }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-success-light text-success">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Total Found Items</p>
+            <h3 class="stat-value">{{ stats.found_items }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-warning-light text-warning">
+            <i class="fas fa-handshake"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Total Matches</p>
+            <h3 class="stat-value">{{ stats.total_matches }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-info-light text-info">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Items Returned</p>
+            <h3 class="stat-value">{{ stats.items_returned }}</h3>
+        </div>
+    </div>
+
+    <!-- Row 2: Personal Stats -->
+    <div class="stat-card">
+        <div class="stat-icon bg-primary-light text-primary">
+            <i class="fas fa-list-ul"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">My Posts</p>
+            <h3 class="stat-value">{{ stats.my_posts }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-danger-light text-danger">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Claim Requests</p>
+            <h3 class="stat-value">{{ stats.claim_requests }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-secondary-light text-muted">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Active Chats</p>
+            <h3 class="stat-value">{{ stats.chats }}</h3>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-info-light text-info">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="stat-details">
+            <p class="stat-label">Notifications</p>
+            <h3 class="stat-value">{{ stats.notifications }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="dashboard-layout">
+    <!-- Left Column: Activity Feed -->
+    <div class="activity-column">
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Community Activity</h3>
+                <a href="{{ url_for('items.search') }}" class="text-small">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="activity-feed">
+                    {% for activity in recent_activities %}
+                    <li class="activity-item">
+                        <div class="activity-icon {% if activity.type == 'lost' %}bg-warning-light text-warning{% else %}bg-success-light text-success{% endif %}">
+                            <i class="fas {% if activity.type == 'lost' %}fa-search{% else %}fa-box{% endif %}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-0">
+                                <strong>Someone {{ activity.type }}</strong> a 
+                                <em>{{ activity.item_name }}</em> at {{ activity.location }}
+                            </p>
+                            <span class="text-small text-muted">{{ activity.time_ago }}</span>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="p-4 text-center text-muted">No recent activities found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Notifications & Quick Actions -->
+    <div class="sidebar-column">
+        <!-- Notifications Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Recent Notifications</h3>
+                <a href="{{ url_for('notifications.list_notifications') }}" class="text-small">See All</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="notification-list">
+                    {% for notif in recent_notifications %}
+                    <li class="notification-item">
+                        <div class="notification-indicator {% if notif.type == 'match' %}bg-success{% elif notif.type == 'chat' %}bg-primary{% else %}bg-secondary{% endif %}"></div>
+                        <div class="notification-content">
+                            <p class="mb-0">{{ notif.message }}</p>
+                            <span class="text-small text-muted">{{ notif.time_ago }}</span>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="p-4 text-center text-muted">You're all caught up!</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Quick Help Card -->
+        <div class="card bg-primary text-white border-0">
+            <div class="card-body p-4 text-center">
+                <div class="mb-3" style="font-size: 2.5rem; opacity: 0.9;">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 class="text-white mb-2">Need Help?</h3>
+                <p class="mb-4" style="opacity: 0.8; font-size: 0.9rem;">Check our guide on how to safely return items to their owners.</p>
+                <button class="btn bg-white text-primary btn-block rounded-full">Read Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

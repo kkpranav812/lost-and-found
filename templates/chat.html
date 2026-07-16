@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Messages | Lost & Found{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-container glass-panel shadow-premium">
+    <!-- Left Panel: Conversations List -->
+    <div class="chat-sidebar {% if active_conversation %}d-none d-md-flex{% endif %}">
+        <div class="chat-sidebar-header">
+            <h4>Messages</h4>
+        </div>
+        
+        <div class="conversation-list">
+            {% if conversations %}
+                {% for conv in conversations %}
+                    <a href="{{ url_for('chat.view_chat', conversation_id=conv.id) }}" class="conversation-item {% if conv.is_active %}active{% endif %}">
+                        <div class="conv-avatar">
+                            {% if conv.primary_image %}
+                                <img src="{{ conv.primary_image }}" alt="Item">
+                            {% else %}
+                                <div class="avatar-placeholder bg-primary text-white">
+                                    {{ conv.item_title[:1].upper() }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="conv-details">
+                            <div class="conv-header">
+                                <span class="conv-name">{{ conv.other_user_name }}</span>
+                                <span class="conv-time">{{ conv.last_message_time|date_format }}</span>
+                            </div>
+                            <div class="conv-item-title text-muted small">
+                                <i class="fas fa-box fa-sm me-1"></i>{{ conv.item_title }}
+                            </div>
+                            <div class="conv-preview text-muted">
+                                {% if conv.last_message %}
+                                    {{ conv.last_message[:30] }}{% if conv.last_message|length > 30 %}...{% endif %}
+                                {% else %}
+                                    <em>Start a conversation</em>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state p-4 text-center text-muted">
+                    <i class="fas fa-comments fa-3x mb-3 text-light-blue"></i>
+                    <p>No active conversations yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Panel: Chat Window -->
+    <div class="chat-main {% if not active_conversation %}d-none d-md-flex flex-column align-items-center justify-content-center bg-light{% endif %}">
+        {% if active_conversation %}
+            <!-- Chat Header -->
+            <div class="chat-header border-bottom">
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('chat.index') }}" class="btn btn-icon btn-light d-md-none me-2">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="chat-header-info">
+                        <h5 class="mb-0">{{ active_conversation.other_user_name }}</h5>
+                        <a href="{{ url_for('items.detail', id=active_conversation.item_id) }}" class="text-muted small text-decoration-none">
+                            Regarding: <strong>{{ active_conversation.item_title }}</strong>
+                        </a>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <span class="badge {% if active_conversation.item_status == 'lost' %}bg-danger{% elif active_conversation.item_status == 'found' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ active_conversation.item_status|title }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="message-wrapper {% if msg.sender_id == current_user_id %}message-out{% else %}message-in{% endif %}">
+                            <div class="message-bubble shadow-sm">
+                                <div class="message-content">
+                                    {{ msg.content }}
+                                </div>
+                                <div class="message-meta">
+                                    {{ msg.created_at|date_format }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted my-4">
+                        <p class="mb-0">This is the start of your conversation.</p>
+                        <p class="small">Say hello and figure out how to return the item!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator-container text-muted small px-3 py-1 d-none" id="typingIndicator">
+                <span class="fst-italic">Typing...</span>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-area border-top">
+                <form id="chatForm" class="d-flex w-100 align-items-center">
+                    <textarea id="messageInput" class="form-control" rows="1" placeholder="Type a message..." required></textarea>
+                    <button type="submit" class="btn btn-primary btn-icon ms-2 shadow-sm" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Store variables for JS -->
+            <script>
+                window.CHAT_CONFIG = {
+                    conversationId: {{ active_conversation.id }},
+                    currentUserId: {{ current_user_id }}
+                };
+            </script>
+        {% else %}
+            <!-- No Active Chat State -->
+            <div class="text-center text-muted">
+                <div class="illustration mb-4">
+                    <i class="fas fa-paper-plane fa-4x text-light-blue opacity-50"></i>
+                </div>
+                <h4>Your Messages</h4>
+                <p>Select a conversation from the left to start chatting.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

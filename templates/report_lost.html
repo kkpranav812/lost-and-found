@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Report Lost Item{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+    #leaflet-map { height: 280px; border-radius: var(--radius-lg); z-index: 1; margin-top: 0.75rem; border: 1px solid var(--border-color); }
+    .map-toolbar { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+    .map-toolbar input { flex-grow: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="mb-4">
+        <a href="{{ url_for('dashboard') }}" class="text-muted"><i class="fas fa-arrow-left me-2"></i>Back to Dashboard</a>
+    </div>
+
+    <div class="form-card">
+        <div class="mb-4">
+            <h2>Report a Lost Item 🔍</h2>
+            <p class="text-muted">Fill out the details below to help us match your lost belongings with reported finds.</p>
+        </div>
+
+        <form action="{{ url_for('items.report_lost') }}" method="POST" enctype="multipart/form-data">
+            
+            <!-- Item Details -->
+            <div class="form-group">
+                <label for="title">Item Name / Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="e.g., Space Gray iPhone 13 Pro" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category_id">Category <span class="required">*</span></label>
+                    <select id="category_id" name="category_id" class="form-control" required>
+                        <option value="" disabled selected>Select category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="incident_date">Estimated Date Lost</label>
+                    <input type="date" id="incident_date" name="incident_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Detailed Description <span class="required">*</span></label>
+                <textarea id="description" name="description" class="form-control" placeholder="Provide distinct features (e.g., serial numbers, stickers, cracks, cases, brand details)..." required></textarea>
+            </div>
+
+            <!-- Location Details -->
+            <div class="form-group">
+                <label for="location">Where was it lost? <span class="required">*</span></label>
+                <input type="text" id="location" name="location" class="form-control" placeholder="e.g., Engineering Block Library, 2nd Floor" required>
+                <!-- Hidden precise coords stored by map.js -->
+                <input type="hidden" id="lat" name="lat">
+                <input type="hidden" id="lng" name="lng">
+
+                <!-- Map Toolbar: geocode search + locate me -->
+                <div class="map-toolbar">
+                    <input type="text" id="geocodeSearch" class="form-control" placeholder="Search an address on the map…">
+                    <button type="button" id="geocodeBtn" class="btn btn-light btn-sm" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button type="button" id="locateMeBtn" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-crosshairs"></i> My Location
+                    </button>
+                </div>
+
+                <!-- Leaflet Map Container -->
+                <div id="leaflet-map"></div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group">
+                <label>Upload Item Images</label>
+                <div class="image-upload-wrapper">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <p class="mb-1 font-weight-600">Drag & drop files or click to upload</p>
+                    <p class="upload-help-text">Supports PNG, JPG, WEBP (Max 5MB per image)</p>
+                    <input type="file" name="images" multiple accept="image/*" id="imageInput">
+                </div>
+                <div id="fileList" class="mt-2 text-small text-muted"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-4 pt-3 d-flex justify-content-end gap-2">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-light">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4">Submit Report</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/report.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

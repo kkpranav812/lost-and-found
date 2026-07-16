@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found Portal - Find What You Lost, Return What You Found</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+    
+    <!-- Top Navbar -->
+    <header class="landing-navbar" id="landingNav">
+        <div class="nav-brand d-flex align-items-center">
+            <div class="brand-icon-box">
+                <i class="fas fa-search-location"></i>
+            </div>
+            <span>L&F Portal</span>
+        </div>
+        
+        <div class="landing-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it Works</a>
+            <a href="{{ url_for('search') }}">Browse Items</a>
+        </div>
+        
+        <div class="landing-nav-actions">
+            {% if is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary rounded-full px-4">Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary rounded-full px-4">Log in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-full px-4 shadow-md">Get Started</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg-blob"></div>
+        <div class="hero-grid">
+            <div class="hero-content">
+                <h1>Lost Something?<br>Found Something?<br><span class="text-primary">We Connect You.</span></h1>
+                <p>The smartest and fastest way to recover your lost belongings. Report lost items or list found items and let our system match you up instantly.</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('report_lost') }}" class="btn btn-primary btn-large shadow-md rounded-full">Report Lost Item</a>
+                    <a href="{{ url_for('report_found') }}" class="btn btn-outline-primary btn-large rounded-full bg-white">Report Found Item</a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h3>1,200+</h3>
+                        <p>Items Recovered</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>98%</h3>
+                        <p>Success Match Rate</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>3,400+</h3>
+                        <p>Active Users</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image-wrapper">
+                <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" alt="Lost items illustration">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <h2 class="text-primary">Why use L&F Portal?</h2>
+            <p class="text-muted font-weight-500">We make reuniting with your belongings effortless through smart technology and a verified community.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Smart Auto-Matching</h3>
+                <p>Our algorithm automatically compares lost and found posts, instantly notifying you if we detect a high-confidence match based on keywords, category, and location.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>Geo-location Tagging</h3>
+                <p>Pinpoint exactly where you lost or found an item on the interactive map. Narrow down search radii to find matches near your specific incident area.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure Claim Verification</h3>
+                <p>Protect your items. Claimants must provide secure proof of ownership (like passwords, distinct marks, or receipts) before items are handed over.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>Real-time Chat</h3>
+                <p>Communicate securely within the platform. Discuss handover locations and verify details without exposing your personal phone number or email.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Instant Alerts</h3>
+                <p>Set up keyword alerts. Lose your 'Blue MacBook'? Get an instant notification the second someone reports finding an item matching that description.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3>Verified Community</h3>
+                <p>A trusted ecosystem. We require email verification for all users, keeping the platform secure, transparent, and spam-free for everyone.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section text-center py-5" style="background: linear-gradient(135deg, var(--primary), #4f46e5); color: white;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 4rem 2rem;">
+            <h2 class="text-white mb-3" style="font-size: 2.5rem;">Ready to find your items?</h2>
+            <p class="mb-4" style="font-size: 1.1rem; opacity: 0.9;">Join thousands of others recovering their belongings every day.</p>
+            <a href="{{ url_for('auth.register') }}" class="btn bg-white text-primary btn-large rounded-full shadow-lg font-weight-700">Create Free Account</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="brand-icon-box" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                    <i class="fas fa-search-location"></i>
+                </div>
+                <h2>Lost & Found Portal</h2>
+                <p>The smartest and fastest way to recover your lost belongings and help your community.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="{{ url_for('search') }}">Browse Items</a></li>
+                    <li><a href="{{ url_for('report_lost') }}">Report Lost</a></li>
+                    <li><a href="{{ url_for('report_found') }}">Report Found</a></li>
+                    <li><a href="#">How it Works</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Success Stories</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Lost & Found Portal. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple navbar shrink on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('landingNav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

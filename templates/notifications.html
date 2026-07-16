@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notif-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .notif-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .notif-list {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .notif-item {
+        display: flex;
+        gap: 1.25rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background var(--transition-fast);
+        position: relative;
+    }
+    
+    .notif-item:last-child {
+        border-bottom: none;
+    }
+    
+    .notif-item.unread {
+        background-color: var(--primary-light);
+    }
+    
+    .notif-item:hover {
+        background-color: var(--border-light);
+    }
+    
+    .notif-icon-wrapper {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    /* Type-specific colors for icons */
+    .icon-new_claim { background-color: var(--warning-light); color: var(--warning); }
+    .icon-claim_approved { background-color: var(--success-light); color: var(--success); }
+    .icon-claim_rejected { background-color: var(--danger-light); color: var(--danger); }
+    .icon-match_found { background-color: var(--info-light); color: var(--info); }
+    .icon-new_message { background-color: #e2e8f0; color: var(--secondary); }
+    .icon-system { background-color: #cbd5e1; color: var(--text-muted); }
+    
+    .notif-content {
+        flex-grow: 1;
+    }
+    
+    .notif-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .notif-body {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .notif-time {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+    
+    .notif-actions {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+    }
+    
+    .notif-item:hover .notif-actions {
+        opacity: 1;
+    }
+    
+    .action-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-light);
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 4px;
+        border-radius: 4px;
+        transition: color var(--transition-fast), background var(--transition-fast);
+    }
+    
+    .action-btn:hover {
+        color: var(--text-main);
+        background: var(--border-color);
+    }
+    
+    .action-btn.delete:hover {
+        color: var(--danger);
+        background: var(--danger-light);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        border: 1px dashed var(--border-color);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notif-container">
+    <div class="notif-header">
+        <div>
+            <h1 class="mb-1">Notifications</h1>
+            <p class="text-muted">Stay updated with claims, matches, and actions on your items.</p>
+        </div>
+        {% if notifications %}
+            <form action="{{ url_for('notifications.mark_all_read') }}" method="POST">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fa-solid fa-check-double"></i> Mark all read
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+        <div class="notif-list">
+            {% for notif in notifications %}
+                <div class="notif-item {% if not notif.is_read %}unread{% endif %}" id="notif-{{ notif.id }}">
+                    <div class="notif-icon-wrapper icon-{{ notif.type }}">
+                        {% if notif.type == 'new_claim' %}
+                            <i class="fa-solid fa-file-invoice"></i>
+                        {% elif notif.type == 'claim_approved' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% elif notif.type == 'claim_rejected' %}
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        {% elif notif.type == 'match_found' %}
+                            <i class="fa-solid fa-magnifying-glass-location"></i>
+                        {% elif notif.type == 'new_message' %}
+                            <i class="fa-solid fa-envelope"></i>
+                        {% else %}
+                            <i class="fa-solid fa-bell"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="notif-content">
+                        <div class="notif-title">
+                            {% if notif.item_id %}
+                                <a href="{{ url_for('items.item_detail', item_id=notif.item_id) }}">{{ notif.title }}</a>
+                            {% else %}
+                                {{ notif.title }}
+                            {% endif %}
+                        </div>
+                        {% if notif.body %}
+                            <div class="notif-body">{{ notif.body }}</div>
+                        {% endif %}
+                        <div class="notif-time">
+                            {{ notif.created_at.strftime('%b %d, %Y - %I:%M %p') if notif.created_at else 'Recently' }}
+                        </div>
+                    </div>
+                    
+                    <div class="notif-actions">
+                        {% if not notif.is_read %}
+                            <button type="button" class="action-btn" title="Mark as Read" onclick="markAsRead({{ notif.id }})">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        {% endif %}
+                        <form action="{{ url_for('notifications.delete_notification', notif_id=notif.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="action-btn delete" title="Delete Notification">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-bell-slash"></i>
+            <h2>All caught up!</h2>
+            <p class="text-muted">You have no new notifications.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

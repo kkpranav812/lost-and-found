@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" preserveAspectRatio="xMidYMax meet">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DCEEFF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#DCEEFF" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="mountainGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B8D4F0" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#DCEEFF" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="treeGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="treeGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6EE7B7"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+    <linearGradient id="buildingGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#93C5FD" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#60A5FA" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="buildingGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BFDBFE" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#93C5FD" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background wash -->
+  <rect x="0" y="40" width="500" height="80" fill="url(#skyGrad)"/>
+  
+  <!-- Distant mountains -->
+  <path d="M0 90 L40 55 L80 75 L120 50 L160 70 L200 45 L240 65 L280 48 L320 68 L360 42 L400 62 L440 52 L480 65 L500 55 L500 120 L0 120 Z" fill="url(#mountainGrad)" opacity="0.4"/>
+  
+  <!-- Clouds -->
+  <g opacity="0.3">
+    <ellipse cx="80" cy="45" rx="25" ry="8" fill="white"/>
+    <ellipse cx="95" cy="42" rx="18" ry="6" fill="white"/>
+    <ellipse cx="350" cy="38" rx="30" ry="9" fill="white"/>
+    <ellipse cx="370" cy="35" rx="20" ry="7" fill="white"/>
+  </g>
+  
+  <!-- Background buildings (city skyline) -->
+  <!-- Left cluster -->
+  <rect x="30" y="60" width="18" height="60" rx="3" fill="url(#buildingGrad2)" opacity="0.5"/>
+  <rect x="50" y="50" width="14" height="70" rx="2" fill="url(#buildingGrad1)" opacity="0.4"/>
+  <rect x="66" y="65" width="20" height="55" rx="3" fill="url(#buildingGrad2)" opacity="0.45"/>
+  
+  <!-- Center left cluster -->
+  <rect x="110" y="55" width="16" height="65" rx="2" fill="url(#buildingGrad1)" opacity="0.35"/>
+  <rect x="128" y="62" width="22" height="58" rx="3" fill="url(#buildingGrad2)" opacity="0.4"/>
+  <rect x="152" y="68" width="12" height="52" rx="2" fill="url(#buildingGrad1)" opacity="0.3"/>
+  
+  <!-- Center buildings -->
+  <rect x="210" y="52" width="20" height="68" rx="3" fill="url(#buildingGrad1)" opacity="0.4"/>
+  <rect x="232" y="58" width="15" height="62" rx="2" fill="url(#buildingGrad2)" opacity="0.35"/>
+  <rect x="249" y="48" width="18" height="72" rx="3" fill="url(#buildingGrad1)" opacity="0.45"/>
+  
+  <!-- Center right cluster -->
+  <rect x="310" y="60" width="16" height="60" rx="2" fill="url(#buildingGrad2)" opacity="0.4"/>
+  <rect x="328" y="53" width="20" height="67" rx="3" fill="url(#buildingGrad1)" opacity="0.35"/>
+  <rect x="350" y="65" width="14" height="55" rx="2" fill="url(#buildingGrad2)" opacity="0.4"/>
+  
+  <!-- Right cluster -->
+  <rect x="400" y="58" width="18" height="62" rx="3" fill="url(#buildingGrad1)" opacity="0.4"/>
+  <rect x="420" y="52" width="14" height="68" rx="2" fill="url(#buildingGrad2)" opacity="0.35"/>
+  <rect x="436" y="63" width="22" height="57" rx="3" fill="url(#buildingGrad1)" opacity="0.4"/>
+  
+  <!-- Building windows (tiny rectangles) -->
+  <g fill="white" opacity="0.3">
+    <rect x="35" y="68" width="4" height="3" rx="0.5"/><rect x="41" y="68" width="4" height="3" rx="0.5"/>
+    <rect x="35" y="75" width="4" height="3" rx="0.5"/><rect x="41" y="75" width="4" height="3" rx="0.5"/>
+    <rect x="215" y="60" width="5" height="3" rx="0.5"/><rect x="222" y="60" width="5" height="3" rx="0.5"/>
+    <rect x="215" y="67" width="5" height="3" rx="0.5"/><rect x="222" y="67" width="5" height="3" rx="0.5"/>
+    <rect x="253" y="56" width="4" height="3" rx="0.5"/><rect x="259" y="56" width="4" height="3" rx="0.5"/>
+    <rect x="253" y="63" width="4" height="3" rx="0.5"/><rect x="259" y="63" width="4" height="3" rx="0.5"/>
+    <rect x="405" y="65" width="4" height="3" rx="0.5"/><rect x="411" y="65" width="4" height="3" rx="0.5"/>
+  </g>
+  
+  <!-- Ground / hills -->
+  <path d="M0 95 Q50 82 100 90 Q150 80 200 88 Q250 78 300 86 Q350 80 400 88 Q450 82 500 92 L500 120 L0 120 Z" fill="#8FD694" opacity="0.6"/>
+  <path d="M0 100 Q60 88 120 96 Q180 85 240 94 Q300 84 360 93 Q420 87 500 98 L500 120 L0 120 Z" fill="#6EE7B7" opacity="0.5"/>
+  
+  <!-- Grass base -->
+  <rect x="0" y="105" width="500" height="15" fill="#86EFAC" opacity="0.3"/>
+  
+  <!-- Trees - left section -->
+  <!-- Tree 1 (tall dark) -->
+  <g transform="translate(20, 70)">
+    <rect x="6" y="25" width="4" height="15" fill="#065F46" opacity="0.6"/>
+    <path d="M8 0 L16 15 L13 13 L18 25 L-2 25 L3 13 L0 15 Z" fill="url(#treeGrad1)"/>
+  </g>
+  
+  <!-- Tree 2 (medium) -->
+  <g transform="translate(45, 75)">
+    <rect x="5" y="20" width="3" height="12" fill="#065F46" opacity="0.6"/>
+    <path d="M6.5 0 L13 12 L10 11 L15 20 L-2 20 L3 11 L0 12 Z" fill="url(#treeGrad2)"/>
+  </g>
+  
+  <!-- Tree 3 (round bush) -->
+  <g transform="translate(75, 82)">
+    <rect x="4" y="12" width="3" height="10" fill="#065F46" opacity="0.5"/>
+    <ellipse cx="5.5" cy="8" rx="9" ry="10" fill="#34D399" opacity="0.8"/>
+  </g>
+  
+  <!-- Trees - center left -->
+  <g transform="translate(130, 72)">
+    <rect x="6" y="22" width="4" height="14" fill="#065F46" opacity="0.6"/>
+    <path d="M8 0 L16 14 L12 12 L17 22 L-1 22 L4 12 L0 14 Z" fill="url(#treeGrad1)"/>
+  </g>
+  
+  <g transform="translate(155, 78)">
+    <rect x="4" y="16" width="3" height="10" fill="#065F46" opacity="0.5"/>
+    <path d="M5.5 0 L11 10 L8 9 L12 16 L-1 16 L3 9 L0 10 Z" fill="url(#treeGrad2)"/>
+  </g>
+  
+  <!-- Trees - center -->
+  <g transform="translate(225, 68)">
+    <rect x="7" y="28" width="4" height="16" fill="#065F46" opacity="0.6"/>
+    <path d="M9 0 L18 16 L14 14 L20 28 L-2 28 L4 14 L0 16 Z" fill="url(#treeGrad1)"/>
+  </g>
+  
+  <g transform="translate(250, 76)">
+    <rect x="5" y="18" width="3" height="12" fill="#065F46" opacity="0.5"/>
+    <ellipse cx="6.5" cy="10" rx="10" ry="12" fill="#6EE7B7" opacity="0.7"/>
+  </g>
+  
+  <!-- Trees - center right -->
+  <g transform="translate(310, 73)">
+    <rect x="5" y="20" width="4" height="14" fill="#065F46" opacity="0.6"/>
+    <path d="M7 0 L14 12 L11 11 L16 20 L-2 20 L3 11 L0 12 Z" fill="url(#treeGrad1)"/>
+  </g>
+  
+  <g transform="translate(340, 80)">
+    <rect x="4" y="14" width="3" height="10" fill="#065F46" opacity="0.5"/>
+    <path d="M5 0 L10 8 L8 7 L12 14 L-2 14 L2 7 L0 8 Z" fill="url(#treeGrad2)"/>
+  </g>
+  
+  <!-- Trees - right section -->
+  <g transform="translate(395, 70)">
+    <rect x="6" y="25" width="4" height="15" fill="#065F46" opacity="0.6"/>
+    <path d="M8 0 L16 15 L12 13 L18 25 L-2 25 L4 13 L0 15 Z" fill="url(#treeGrad1)"/>
+  </g>
+  
+  <g transform="translate(425, 76)">
+    <rect x="5" y="18" width="3" height="12" fill="#065F46" opacity="0.5"/>
+    <ellipse cx="6.5" cy="10" rx="9" ry="11" fill="#34D399" opacity="0.7"/>
+  </g>
+  
+  <g transform="translate(460, 80)">
+    <rect x="4" y="14" width="3" height="10" fill="#065F46" opacity="0.5"/>
+    <path d="M5 0 L10 8 L8 7 L12 14 L-2 14 L2 7 L0 8 Z" fill="url(#treeGrad2)"/>
+  </g>
+  
+  <!-- Small bushes -->
+  <ellipse cx="100" cy="100" rx="12" ry="6" fill="#6EE7B7" opacity="0.5"/>
+  <ellipse cx="190" cy="98" rx="10" ry="5" fill="#34D399" opacity="0.4"/>
+  <ellipse cx="280" cy="97" rx="14" ry="6" fill="#6EE7B7" opacity="0.45"/>
+  <ellipse cx="370" cy="99" rx="11" ry="5" fill="#34D399" opacity="0.4"/>
+  <ellipse cx="475" cy="98" rx="12" ry="5" fill="#6EE7B7" opacity="0.5"/>
+</svg>

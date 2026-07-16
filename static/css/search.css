@@ -1,0 +1,286 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ * search.css
+ * Styling for the Search and Browse Items layout, grids, filters, and cards
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/* Search Header Gradient */
+.search-header {
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.search-header h1 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+/* Search bar on top */
+.main-search-form {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 10;
+}
+
+.main-search-form input {
+    border: none;
+    box-shadow: none;
+    flex-grow: 1;
+    padding-left: 1.5rem;
+    font-size: 1.1rem;
+    outline: none;
+    width: 100%;
+}
+
+.main-search-form select {
+    border: none;
+    border-left: 1px solid var(--border-color);
+    border-radius: 0;
+    width: 200px;
+    background-color: transparent;
+    padding: 0 1rem;
+    outline: none;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .main-search-form {
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+    }
+    .main-search-form input, .main-search-form select, .main-search-form button {
+        border-radius: var(--radius-md);
+        width: 100% !important;
+        background: white;
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+        border: 1px solid var(--border-color) !important;
+    }
+    .main-search-form select {
+        border-left: none;
+    }
+}
+
+/* Sidebar filter panel */
+.filter-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    position: sticky;
+    top: 85px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: block;
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+
+.filter-pill {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.filter-pill:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+input[type="radio"].hidden-radio {
+    display: none;
+}
+
+input[type="radio"].hidden-radio:checked + .filter-pill {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(18, 81, 230, 0.1);
+}
+
+/* Search results items grid */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Card details styling */
+.item-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: var(--transition-bounce);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.item-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+}
+
+.item-image {
+    height: 200px;
+    background: #f1f5f9;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.item-card:hover .item-image img {
+    transform: scale(1.06);
+}
+
+.item-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: var(--shadow-sm);
+}
+
+.badge-lost { background: var(--warning); color: white; }
+.badge-found { background: var(--success); color: white; }
+
+.item-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-category {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.item-title {
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+.item-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.item-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Pagination container styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+}
+
+.page-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.page-link:hover {
+    background: var(--bg-main);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.page-link.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}

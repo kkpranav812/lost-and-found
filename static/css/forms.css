@@ -1,0 +1,160 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ * forms.css
+ * Unified Premium Forms Styling for Reporting & CRUD operations
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/* Container & Cards */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem;
+}
+
+@media (max-width: 576px) {
+    .form-card {
+        padding: 1.5rem;
+    }
+}
+
+.form-card h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Two Column form layout */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+/* Form Controls */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.form-group label span.required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    background-color: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Image Upload Area */
+.image-upload-wrapper {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.image-upload-wrapper:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.image-upload-wrapper input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-icon {
+    font-size: 2rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    transition: var(--transition-normal);
+}
+
+.image-upload-wrapper:hover .upload-icon {
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.upload-help-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Interactive Map Placeholder */
+.map-placeholder {
+    height: 250px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+.map-placeholder-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.map-overlay-text {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}

@@ -1,0 +1,227 @@
+/* static/css/chat.css */
+
+.chat-container {
+    display: flex;
+    height: calc(100vh - 120px);
+    min-height: 500px;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+}
+
+/* Left Panel */
+.chat-sidebar {
+    width: 350px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--white);
+}
+
+.chat-sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--light-bg);
+}
+
+.chat-sidebar-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.conversation-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.conversation-item {
+    display: flex;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--dark-text);
+    transition: background-color 0.2s;
+    align-items: center;
+}
+
+.conversation-item:hover {
+    background-color: var(--light-bg);
+}
+
+.conversation-item.active {
+    background-color: #eef5ff; /* Light blue tint */
+    border-left: 4px solid var(--primary-blue);
+}
+
+.conv-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.conv-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.conv-details {
+    flex: 1;
+    min-width: 0; /* for text truncation */
+}
+
+.conv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.25rem;
+}
+
+.conv-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conv-time {
+    font-size: 0.75rem;
+    color: #888;
+    white-space: nowrap;
+    margin-left: 0.5rem;
+}
+
+.conv-preview {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Right Panel */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: #fcfcfc;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--white);
+    min-height: 70px;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.message-in {
+    justify-content: flex-start;
+}
+
+.message-out {
+    justify-content: flex-end;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    position: relative;
+}
+
+.message-in .message-bubble {
+    background-color: var(--white);
+    color: var(--dark-text);
+    border-bottom-left-radius: 4px;
+    border: 1px solid #eaeaea;
+}
+
+.message-out .message-bubble {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border-bottom-right-radius: 4px;
+}
+
+.message-meta {
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+    opacity: 0.7;
+    text-align: right;
+}
+
+.message-in .message-meta {
+    text-align: left;
+}
+
+.chat-input-area {
+    padding: 1rem 1.5rem;
+    background-color: var(--white);
+}
+
+.chat-input-area textarea {
+    resize: none;
+    border-radius: 20px;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: none;
+}
+
+.chat-input-area textarea:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+/* Typing indicator */
+.typing-indicator-container {
+    height: 24px;
+    margin-top: -10px;
+    background-color: transparent;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-container {
+        height: calc(100vh - 150px);
+    }
+    
+    .chat-sidebar {
+        width: 100%;
+    }
+    
+    .chat-main {
+        width: 100%;
+    }
+}

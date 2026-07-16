@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Search & Browse Items{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Search Header -->
+<div class="search-header">
+    <h1>Find What You're Looking For</h1>
+    <p style="opacity: 0.9;">Browse through {{ total_items }} reported items in your community.</p>
+    
+    <form action="{{ url_for('items.search') }}" method="GET" class="main-search-form mt-4" id="mainSearchForm">
+        <!-- Preserve other filters -->
+        <input type="hidden" name="type" value="{{ current_type or '' }}">
+        
+        <input type="text" name="q" placeholder="Search by keywords (e.g. Blue Backpack, iPhone 13)..." value="{{ q }}" class="form-control" autocomplete="off">
+        
+        <select name="category" class="form-control" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if current_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn btn-primary px-4 btn-large" style="border-radius: var(--radius-md);">
+            <i class="fas fa-search"></i> Search
+        </button>
+    </form>
+</div>
+
+<div class="row d-flex flex-wrap gap-4" style="flex-wrap: nowrap;">
+    <!-- Filter Sidebar -->
+    <aside class="col-md-3" style="min-width: 260px;">
+        <div class="filter-panel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0 text-primary"><i class="fas fa-sliders-h me-2"></i>Filters</h3>
+                <a href="{{ url_for('items.search') }}" class="text-small text-muted">Clear</a>
+            </div>
+            
+            <form action="{{ url_for('items.search') }}" method="GET" id="filterForm">
+                <!-- Preserve search query -->
+                <input type="hidden" name="q" value="{{ q }}">
+                <input type="hidden" name="category" value="{{ current_category or '' }}">
+                
+                <div class="filter-group">
+                    <label>Item Type</label>
+                    <div class="d-flex flex-wrap">
+                        <label>
+                            <input type="radio" name="type" value="" class="hidden-radio" onchange="this.form.submit()" {% if not current_type %}checked{% endif %}>
+                            <span class="filter-pill">All</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="type" value="lost" class="hidden-radio" onchange="this.form.submit()" {% if current_type == 'lost' %}checked{% endif %}>
+                            <span class="filter-pill">Lost Items</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="type" value="found" class="hidden-radio" onchange="this.form.submit()" {% if current_type == 'found' %}checked{% endif %}>
+                            <span class="filter-pill">Found Items</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Status</label>
+                    <div class="d-flex flex-wrap">
+                        <label>
+                            <input type="radio" name="status" value="open" class="hidden-radio" onchange="this.form.submit()" {% if current_status == 'open' %}checked{% endif %}>
+                            <span class="filter-pill">Active / Open</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="status" value="resolved" class="hidden-radio" onchange="this.form.submit()" {% if current_status == 'resolved' %}checked{% endif %}>
+                            <span class="filter-pill">Resolved</span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Results Grid -->
+    <main class="col-md-9" style="flex-grow: 1;">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                {% if q %}
+                    Results for "{{ q }}"
+                {% else %}
+                    {% if current_type == 'lost' %}Lost{% elif current_type == 'found' %}Found{% else %}All{% endif %} Items
+                {% endif %}
+            </h2>
+            <span class="text-muted">{{ total_items }} items found</span>
+        </div>
+
+        {% if items %}
+        <div class="items-grid">
+            {% for item in items %}
+            {% include "components/item_card.html" %}
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a href="{{ url_for('items.search', q=q, category=current_category, type=current_type, status=current_status, page=current_page-1) }}" class="page-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for p in range(1, total_pages + 1) %}
+            <a href="{{ url_for('items.search', q=q, category=current_category, type=current_type, status=current_status, page=p) }}" class="page-link {% if p == current_page %}active{% endif %}">
+                {{ p }}
+            </a>
+            {% endfor %}
+            
+            {% if current_page < total_pages %}
+            <a href="{{ url_for('items.search', q=q, category=current_category, type=current_type, status=current_status, page=current_page+1) }}" class="page-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="mb-4 text-muted" style="font-size: 4rem; opacity: 0.3;">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>No items found</h3>
+            <p class="text-muted">Try adjusting your filters or search terms.</p>
+            <a href="{{ url_for('items.search') }}" class="btn btn-outline-primary mt-3">Clear all filters</a>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}

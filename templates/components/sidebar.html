@@ -1,0 +1,102 @@
+<!-- Left Sidebar Component -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">Menu</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('search') }}" class="sidebar-link {% if request.endpoint == 'search' %}active{% endif %}">
+                    <i class="fas fa-search"></i>
+                    <span class="text">Browse Items</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('report_lost') }}" class="sidebar-link {% if request.endpoint == 'report_lost' %}active{% endif %}">
+                    <i class="fas fa-bullhorn"></i>
+                    <span class="text">Report Lost Item</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('report_found') }}" class="sidebar-link {% if request.endpoint == 'report_found' %}active{% endif %}">
+                    <i class="fas fa-box-open"></i>
+                    <span class="text">Report Found Item</span>
+                </a>
+            </li>
+            {% if g.user and g.user.role == 'admin' %}
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.') %}active{% endif %}">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="text">Admin Panel</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-title">My Activity</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('my_posts') }}" class="sidebar-link {% if request.endpoint == 'my_posts' %}active{% endif %}">
+                    <i class="far fa-list-alt"></i>
+                    <span class="text">My Posts</span>
+                    <span class="sidebar-badge">2</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('claims.my_claims') }}" class="sidebar-link {% if request.endpoint == 'claims.my_claims' %}active{% endif %}">
+                    <i class="far fa-handshake"></i>
+                    <span class="text">My Claims</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('claims.claim_requests') }}" class="sidebar-link {% if request.endpoint == 'claims.claim_requests' %}active{% endif %}">
+                    <i class="far fa-bell"></i>
+                    <span class="text">Claim Requests</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('chat.index') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('chat.') %}active{% endif %}">
+                    <i class="far fa-comments"></i>
+                    <span class="text">Messages</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {% if is_admin_user %}
+    <div class="sidebar-section">
+        <div class="sidebar-title">Admin</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin') %}active{% endif %}">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="text">Admin Panel</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="sidebar-section mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('auth.change_password_view') }}" class="sidebar-link">
+                    <i class="fas fa-key"></i>
+                    <span class="text">Change Password</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

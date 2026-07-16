@@ -1,0 +1,87 @@
+<!-- Reusable Item Card Component -->
+<div class="item-card {% if item.status == 'resolved' %}status-resolved{% endif %}" data-item-id="{{ item.id }}" data-type="{{ item.type }}" data-status="{{ item.status }}">
+    <div class="item-image">
+        <span class="item-badge badge-{{ item.type }}">{{ item.type | upper }}</span>
+        {% if item.status == 'resolved' %}
+            <span class="status-overlay-badge badge-success"><i class="fas fa-check-circle me-1"></i>Returned / Resolved</span>
+        {% endif %}
+        
+        {% if item.primary_image %}
+            <img src="{{ item.primary_image }}" alt="{{ item.title }}" loading="lazy">
+        {% else %}
+            <div class="no-image-placeholder">
+                <i class="fas fa-image fa-3x" style="opacity: 0.15;"></i>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="item-body">
+        <div class="item-category">
+            {% if item.category_icon %}<i class="fas {{ item.category_icon }}"></i>{% endif %}
+            {{ item.category_name }}
+        </div>
+        
+        <h3 class="item-title">
+            <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="text-decoration-none text-main">{{ item.title }}</a>
+        </h3>
+        
+        <div class="item-meta">
+            <i class="fas fa-map-marker-alt text-primary"></i> 
+            <span class="text-truncate" title="{{ item.location_text }}">{{ item.location_text }}</span>
+        </div>
+        
+        {% if item.incident_date %}
+        <div class="item-meta">
+            <i class="far fa-calendar-alt text-muted"></i>
+            <span>
+                {% if item.type == 'lost' %}Lost{% else %}Found{% endif %} on 
+                {{ item.incident_date }}
+            </span>
+        </div>
+        {% endif %}
+        
+        <div class="item-footer mt-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="avatar" style="width: 24px; height: 24px; font-size: 0.7rem; background-color: var(--primary);">
+                    {{ item.user_name[0] | upper if item.user_name else 'U' }}
+                </div>
+                <span class="text-small text-muted">{{ item.user_name or 'User' }}</span>
+            </div>
+            <span class="text-small text-muted">
+                {% if item.created_at is string %}
+                    {{ item.created_at }}
+                {% else %}
+                    {{ item.created_at.strftime('%b %d') }}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .no-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+    }
+    .status-resolved {
+        opacity: 0.85;
+        border-color: var(--success-light) !important;
+    }
+    .status-overlay-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 700;
+        z-index: 2;
+        box-shadow: var(--shadow-sm);
+        background-color: var(--success);
+        color: white;
+    }
+</style>

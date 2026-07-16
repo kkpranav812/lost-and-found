@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Manage Categories - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin.items') }}"><i class="fas fa-box-open"></i> Items</a>
+            <a href="{{ url_for('admin.categories') }}" class="active"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.claims') }}"><i class="fas fa-handshake"></i> Claims</a>
+            <a href="{{ url_for('admin.settings') }}"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <header class="admin-content-header">
+            <h2>Manage Categories</h2>
+        </header>
+
+        <section class="admin-data-section">
+            <form action="{{ url_for('admin.categories') }}" method="POST" class="add-category-form card">
+                <h4>Add New Category</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Category Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="icon">FontAwesome Icon Class (e.g. fa-tag)</label>
+                        <input type="text" id="icon" name="icon" class="form-control" value="fa-tag">
+                    </div>
+                    <div class="form-group">
+                        <label for="color_hex">Color Hex Code</label>
+                        <input type="color" id="color_hex" name="color_hex" class="form-control" value="#6B7280">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Add Category</button>
+            </form>
+
+            <table class="admin-table mt-5">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Icon</th>
+                        <th>Name</th>
+                        <th>Color</th>
+                        <th>Sort Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr id="cat-row-{{ cat.id }}">
+                        <td>{{ cat.id }}</td>
+                        <td>
+                            <div class="category-icon-preview" style="background-color: {{ cat.color_hex }}20; color: {{ cat.color_hex }}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas {{ cat.icon }}"></i>
+                            </div>
+                        </td>
+                        <td>{{ cat.name }}</td>
+                        <td><span class="color-badge" style="background-color: {{ cat.color_hex }}">{{ cat.color_hex }}</span></td>
+                        <td>{{ cat.sort_order }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger delete-cat-btn" data-cat-id="{{ cat.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No categories found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

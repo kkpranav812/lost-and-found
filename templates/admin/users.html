@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Manage Users - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="active"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin.items') }}"><i class="fas fa-box-open"></i> Items</a>
+            <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.claims') }}"><i class="fas fa-handshake"></i> Claims</a>
+            <a href="{{ url_for('admin.settings') }}"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Admin Content -->
+    <main class="admin-content">
+        <header class="admin-content-header">
+            <h2>Manage Users</h2>
+            <form action="{{ url_for('admin.users') }}" method="GET" class="admin-search-form">
+                <input type="text" name="search" placeholder="Search users..." value="{{ search }}">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+            </form>
+        </header>
+
+        <section class="admin-data-section">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td><span class="badge badge-{{ 'admin' if user.role == 'admin' else 'user' }}">{{ user.role|title }}</span></td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if user.is_active else 'danger' }}" id="status-{{ user.id }}">
+                                {{ 'Active' if user.is_active else 'Banned' }}
+                            </span>
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if user.role != 'admin' %}
+                            <button class="btn btn-sm btn-outline-danger toggle-ban-btn" data-user-id="{{ user.id }}">
+                                <i class="fas fa-ban"></i> Toggle Ban
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

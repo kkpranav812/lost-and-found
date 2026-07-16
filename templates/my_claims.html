@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}My Claims{% endblock %}
+
+{% block extra_css %}
+<style>
+    .claims-list-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+    
+    .claims-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    
+    .claims-table th {
+        background: var(--border-light);
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .claims-table td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+    
+    .claims-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .claims-table tr:hover {
+        background: #fafafa;
+    }
+    
+    .item-link {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+    
+    .item-link:hover {
+        color: var(--primary);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        border: 1px dashed var(--border-color);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">My Claims</h1>
+        <p class="text-muted">Track all claim requests you've submitted for items you believe are yours or that you found.</p>
+    </div>
+</div>
+
+{% if claims %}
+    <div class="claims-list-card">
+        <table class="claims-table">
+            <thead>
+                <tr>
+                    <th>Item Claimed</th>
+                    <th>Reporter</th>
+                    <th>Proof Provided</th>
+                    <th>Submitted Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                    <tr>
+                        <td>
+                            <div>
+                                <a href="{{ url_for('items.item_detail', item_id=claim.item_id) }}" class="item-link">{{ claim.item_title }}</a>
+                                <div class="mt-1">
+                                    <span class="badge badge-primary">{{ claim.item_type | capitalize }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="font-weight-500">{{ claim.reporter_name }}</span>
+                        </td>
+                        <td>
+                            <div class="text-muted" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ claim.description }}">
+                                {{ claim.description or 'No proof description provided.' }}
+                            </div>
+                            {% if claim.reviewer_note %}
+                                <div class="mt-1" style="font-size: 0.8rem; color: var(--text-muted);">
+                                    <strong>Note:</strong> <i>"{{ claim.reviewer_note }}"</i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="text-muted">{{ claim.created_at.strftime('%b %d, %Y') if claim.created_at else 'Unknown' }}</span>
+                        </td>
+                        <td>
+                            {% if claim.status == 'pending' %}
+                                <span class="badge badge-warning">Pending</span>
+                            {% elif claim.status == 'approved' %}
+                                <span class="badge badge-success">Approved</span>
+                            {% elif claim.status == 'rejected' %}
+                                <span class="badge badge-danger">Rejected</span>
+                            {% else %}
+                                <span class="badge badge-primary">{{ claim.status | capitalize }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-file-invoice"></i>
+        <h2>No claims submitted</h2>
+        <p class="text-muted">You haven't claimed any items yet. When viewing a lost or found item details, you can submit a claim.</p>
+        <a href="{{ url_for('items.search') }}" class="btn btn-primary mt-3">Browse Items</a>
+    </div>
+{% endif %}
+{% endblock %}
