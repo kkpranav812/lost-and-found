@@ -1,3 +1,6 @@
+# pyrefly: ignore [missing-import]
+import eventlet
+eventlet.monkey_patch()
 import os
 from datetime import datetime
 

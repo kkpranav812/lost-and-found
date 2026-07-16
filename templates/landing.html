@@ -27,7 +27,7 @@
         <div class="landing-nav-links">
             <a href="#features">Features</a>
             <a href="#how-it-works">How it Works</a>
-            <a href="{{ url_for('search') }}">Browse Items</a>
+            <a href="{{ url_for('items.search') }}">Browse Items</a>
         </div>
         
         <div class="landing-nav-actions">
@@ -48,8 +48,8 @@
                 <h1>Lost Something?<br>Found Something?<br><span class="text-primary">We Connect You.</span></h1>
                 <p>The smartest and fastest way to recover your lost belongings. Report lost items or list found items and let our system match you up instantly.</p>
                 <div class="hero-actions">
-                    <a href="{{ url_for('report_lost') }}" class="btn btn-primary btn-large shadow-md rounded-full">Report Lost Item</a>
-                    <a href="{{ url_for('report_found') }}" class="btn btn-outline-primary btn-large rounded-full bg-white">Report Found Item</a>
+                    <a href="{{ url_for('items.report_lost') }}" class="btn btn-primary btn-large shadow-md rounded-full">Report Lost Item</a>
+                    <a href="{{ url_for('items.report_found') }}" class="btn btn-outline-primary btn-large rounded-full bg-white">Report Found Item</a>
                 </div>
                 
                 <div class="hero-stats">
@@ -155,9 +155,9 @@
             <div class="footer-col">
                 <h4>Platform</h4>
                 <ul>
-                    <li><a href="{{ url_for('search') }}">Browse Items</a></li>
-                    <li><a href="{{ url_for('report_lost') }}">Report Lost</a></li>
-                    <li><a href="{{ url_for('report_found') }}">Report Found</a></li>
+                    <li><a href="{{ url_for('items.search') }}">Browse Items</a></li>
+                    <li><a href="{{ url_for('items.report_lost') }}">Report Lost</a></li>
+                    <li><a href="{{ url_for('items.report_found') }}">Report Found</a></li>
                     <li><a href="#">How it Works</a></li>
                 </ul>
             </div>

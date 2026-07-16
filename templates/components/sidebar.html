@@ -10,19 +10,19 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('search') }}" class="sidebar-link {% if request.endpoint == 'search' %}active{% endif %}">
+                <a href="{{ url_for('items.search') }}" class="sidebar-link {% if request.endpoint == 'items.search' %}active{% endif %}">
                     <i class="fas fa-search"></i>
                     <span class="text">Browse Items</span>
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('report_lost') }}" class="sidebar-link {% if request.endpoint == 'report_lost' %}active{% endif %}">
+                <a href="{{ url_for('items.report_lost') }}" class="sidebar-link {% if request.endpoint == 'items.report_lost' %}active{% endif %}">
                     <i class="fas fa-bullhorn"></i>
                     <span class="text">Report Lost Item</span>
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('report_found') }}" class="sidebar-link {% if request.endpoint == 'report_found' %}active{% endif %}">
+                <a href="{{ url_for('items.report_found') }}" class="sidebar-link {% if request.endpoint == 'items.report_found' %}active{% endif %}">
                     <i class="fas fa-box-open"></i>
                     <span class="text">Report Found Item</span>
                 </a>
