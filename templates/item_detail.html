@@ -285,8 +285,8 @@
     // Leaflet Integration for Detail View
     document.addEventListener('DOMContentLoaded', () => {
         const mapContainer = document.getElementById('detail-map');
-        const lat = parseFloat("{{ item.lat if item.lat else '' }}");
-        const lng = parseFloat("{{ item.lng if item.lng else '' }}");
+        const lat = parseFloat("{{ item.latitude if item.latitude else '' }}");
+        const lng = parseFloat("{{ item.longitude if item.longitude else '' }}");
 
         if (mapContainer && !isNaN(lat) && !isNaN(lng)) {
             const map = L.map('detail-map', {

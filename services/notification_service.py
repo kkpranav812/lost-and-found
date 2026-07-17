@@ -1,5 +1,6 @@
 from services.db import execute, DatabaseError
 from flask import current_app
+import math
 
 def create_notification(user_id, notif_type, title, body=None, item_id=None, conversation_id=None):
     """
@@ -54,7 +55,7 @@ def check_and_notify_matches(new_item_id) -> int:
     
     # 1. Fetch the details of the new item
     new_item = query_one("""
-        SELECT id, user_id, title, description, type, category_id
+        SELECT id, user_id, title, description, type, category_id, latitude, longitude
         FROM items WHERE id = %s
     """, (new_item_id,))
     if not new_item:
@@ -63,7 +64,7 @@ def check_and_notify_matches(new_item_id) -> int:
     # 2. Query open candidate items of the opposite type in the same category
     opposite_type = 'found' if new_item['type'] == 'lost' else 'lost'
     candidates = query_all("""
-        SELECT id, user_id, title, description
+        SELECT id, user_id, title, description, latitude, longitude
         FROM items
         WHERE type = %s AND category_id = %s AND status = 'open' AND user_id != %s
     """, (opposite_type, new_item['category_id'], new_item['user_id']))
@@ -83,7 +84,27 @@ def check_and_notify_matches(new_item_id) -> int:
         desc_score = calculate_score(new_item['description'], candidate['description'])
         score = (title_score * 0.6) + (desc_score * 0.4)
         
-        # 0.15 is a reasonable word overlap threshold
+        # Location proximity scoring bonus (within 500 meters)
+        if (new_item['latitude'] is not None and new_item['longitude'] is not None and 
+            candidate['latitude'] is not None and candidate['longitude'] is not None):
+            try:
+                lat1, lon1 = float(new_item['latitude']), float(new_item['longitude'])
+                lat2, lon2 = float(candidate['latitude']), float(candidate['longitude'])
+                
+                # Haversine formula
+                r_lat1, r_lon1, r_lat2, r_lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+                dlat = r_lat2 - r_lat1
+                dlon = r_lon2 - r_lon1
+                a = math.sin(dlat / 2)**2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(dlon / 2)**2
+                c = 2 * math.asin(math.sqrt(a))
+                dist_meters = 6371000 * c
+                
+                if dist_meters <= 500:
+                    score += 0.25  # Add bonus for close locations
+            except Exception:
+                pass
+        
+        # 0.15 is a reasonable match threshold
         if score >= 0.15:
             lost_item_id = new_item['id'] if new_item['type'] == 'lost' else candidate['id']
             found_item_id = new_item['id'] if new_item['type'] == 'found' else candidate['id']

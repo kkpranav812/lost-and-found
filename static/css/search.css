@@ -284,3 +284,20 @@ input[type="radio"].hidden-radio:checked + .filter-pill {
     color: white;
     border-color: var(--primary);
 }
+
+/* Custom search layout grid */
+.search-layout-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    align-items: start;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .search-layout-wrapper {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+

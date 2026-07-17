@@ -180,7 +180,7 @@ def _handle_report(req, item_type):
             # 1. Insert Item
             item_id = execute(
                 """
-                INSERT INTO items (user_id, category_id, title, description, type, status, location_text, lat, lng, incident_date)
+                INSERT INTO items (user_id, category_id, title, description, type, status, location_text, latitude, longitude, incident_date)
                 VALUES (%s, %s, %s, %s, %s, 'open', %s, %s, %s, %s)
                 """,
                 (user_id, category_id, title, description, item_type, location, lat, lng, incident_date or None),

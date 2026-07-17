@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Sidebar Toggle Logic ────────────────────────────────────────────────
     const sidebarToggleBtn = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
     if (sidebarToggleBtn && sidebar) {
         sidebarToggleBtn.addEventListener('click', (e) => {
@@ -17,14 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Mobile toggle
                 sidebar.classList.toggle('show');
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.classList.toggle('show');
+                }
             }
         });
+
+        // Close sidebar when clicking backdrop on mobile
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', () => {
+                sidebar.classList.remove('show');
+                sidebarBackdrop.classList.remove('show');
+            });
+        }
 
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 992 && sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !sidebarToggleBtn.contains(e.target)) {
+                if (!sidebar.contains(e.target) && !sidebarToggleBtn.contains(e.target) && (!sidebarBackdrop || !sidebarBackdrop.contains(e.target))) {
                     sidebar.classList.remove('show');
+                    if (sidebarBackdrop) {
+                        sidebarBackdrop.classList.remove('show');
+                    }
                 }
             }
         });
