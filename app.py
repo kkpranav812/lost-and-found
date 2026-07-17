@@ -105,19 +105,30 @@ def dashboard():
     recent_activities = query_all("""
         SELECT id, type, title as item_name, location_text as location, created_at
         FROM items
+        WHERE status = 'open'
         ORDER BY created_at DESC LIMIT 10
     """)
     
-    # Format time_ago in python or jinja. We will pass raw dates and use a simple filter.
+    # Format time_ago
     for activity in recent_activities:
-        # Simple string formatting, a real app would use a proper humanize library
         activity['time_ago'] = activity['created_at'].strftime("%Y-%m-%d %H:%M")
+        
+    # ── Fetch Recently Resolved Matches ──
+    resolved_stories = query_all("""
+        SELECT m.id, m.score,
+               lost.title as lost_title, found.title as found_title,
+               m.updated_at
+        FROM item_matches m
+        JOIN items lost ON m.lost_item_id = lost.id
+        JOIN items found ON m.found_item_id = found.id
+        WHERE m.status = 'verified'
+        ORDER BY m.updated_at DESC LIMIT 5
+    """)
+    for story in resolved_stories:
+        story['time_ago'] = story['updated_at'].strftime("%Y-%m-%d %H:%M")
+        story['percentage'] = int(float(story['score']) * 100) if story['score'] else 0
     
-    recent_notifications = [
-        {'type': 'system', 'message': 'Welcome to Lost & Found Portal!', 'time_ago': 'Just now'}
-    ]
-    
-    return render_template('dashboard.html', stats=stats, recent_activities=recent_activities, recent_notifications=recent_notifications)
+    return render_template('dashboard.html', stats=stats, recent_activities=recent_activities, resolved_stories=resolved_stories)
 
 @app.route('/my-posts')
 @login_required

@@ -19,6 +19,7 @@ def dashboard():
                SUM(CASE WHEN type = 'lost' THEN 1 ELSE 0 END) as lost_count,
                SUM(CASE WHEN type = 'found' THEN 1 ELSE 0 END) as found_count
         FROM items
+        WHERE status = 'open'
         GROUP BY DATE_FORMAT(created_at, '%b %Y'), YEAR(created_at), MONTH(created_at)
         ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
         LIMIT 6
