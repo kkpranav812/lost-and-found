@@ -56,7 +56,8 @@ def view_chat(conversation_id):
     
     # Same query to fetch conversations
     query = """
-        SELECT c.*, i.title as item_title, i.status as item_status, i.primary_image,
+        SELECT c.*, i.title as item_title, i.status as item_status,
+               (SELECT image_url FROM item_images img WHERE img.item_id = i.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as primary_image,
                u1.first_name as u1_first, u1.last_name as u1_last, u1.id as u1_id,
                u2.first_name as u2_first, u2.last_name as u2_last, u2.id as u2_id,
                (SELECT content FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
@@ -229,10 +230,10 @@ def handle_message(data):
         from services.notification_service import create_notification
         create_notification(
             user_id=recipient_id,
-            type='message',
-            title='New Message',
-            message=f"You received a new message from {sender['first_name']}",
-            link=url_for('chat.view_chat', conversation_id=conversation_id)
+            notif_type='new_message',
+            title=f"New message from {sender['first_name']}",
+            body="You have received a new chat message.",
+            conversation_id=conversation_id
         )
     except Exception as e:
         print("Failed to send notification:", e)
