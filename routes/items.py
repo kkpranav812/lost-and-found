@@ -11,6 +11,7 @@ import math
 from services.db import get_db, query_one, query_all, execute, DatabaseError
 from services.auth_service import login_required, get_session_user_id, verified_email_required
 from services.cloudinary_service import validate_image, upload_image, delete_image
+from services.notification_service import check_and_notify_matches
 
 items_bp = Blueprint('items', __name__)
 
@@ -203,6 +204,14 @@ def _handle_report(req, item_type):
                         else:
                             current_app.logger.warning(f"Image upload skipped for {file.filename}: {error}")
                             
+            # 3. Scan for matches
+            try:
+                matches_count = check_and_notify_matches(item_id)
+                if matches_count > 0:
+                    flash(f"We found {matches_count} potential match(es) for your item! Please check your notifications.", "info")
+            except Exception as match_err:
+                current_app.logger.error(f"Error checking matches: {match_err}")
+
             flash(f"Your {item_type} item has been successfully reported!", "success")
             return redirect(url_for('items.item_detail', item_id=item_id))
             
