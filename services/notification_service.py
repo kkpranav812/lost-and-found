@@ -122,9 +122,9 @@ def check_and_notify_matches(new_item_id) -> int:
                     ON DUPLICATE KEY UPDATE score = VALUES(score)
                 """, (lost_item_id, found_item_id, score))
                 
-                # Notify both sides
-                notify_match_found(lost_owner_id, lost_title, found_title, lost_item_id)
-                notify_match_found(found_owner_id, found_title, lost_title, found_item_id)
+                # Notify both sides with cross-linked item IDs
+                notify_match_found(lost_owner_id, lost_title, found_title, found_item_id)
+                notify_match_found(found_owner_id, found_title, lost_title, lost_item_id)
                 matches_count += 1
             except DatabaseError as e:
                 if current_app:
