@@ -2,11 +2,15 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="dashboard-header mb-4">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="mb-1">Welcome back, {{ current_user.first_name }}! 👋</h1>
+            <h1 class="mb-1">Welcome back, {{ current_user.first_name if current_user else 'User' }}! 👋</h1>
             <p class="text-muted mb-0">Here's what's happening with your items and community today.</p>
         </div>
         <div class="d-flex gap-2">
@@ -117,14 +121,16 @@
             <div class="card-body p-0">
                 <ul class="activity-feed">
                     {% for activity in recent_activities %}
-                    <li class="activity-item">
+                    <li class="activity-item position-relative" style="cursor: pointer;" onclick="window.location.href='{{ url_for('items.item_detail', item_id=activity.id) }}'">
                         <div class="activity-icon {% if activity.type == 'lost' %}bg-warning-light text-warning{% else %}bg-success-light text-success{% endif %}">
                             <i class="fas {% if activity.type == 'lost' %}fa-search{% else %}fa-box{% endif %}"></i>
                         </div>
                         <div class="activity-content">
                             <p class="mb-0">
-                                <strong>Someone {{ activity.type }}</strong> a 
-                                <em>{{ activity.item_name }}</em> at {{ activity.location }}
+                                <a href="{{ url_for('items.item_detail', item_id=activity.id) }}" class="text-decoration-none text-main hover-primary" style="font-weight: 500;">
+                                    <strong>Someone {{ activity.type }}</strong> a 
+                                    <em>{{ activity.item_name }}</em> at {{ activity.location }}
+                                </a>
                             </p>
                             <span class="text-small text-muted">{{ activity.time_ago }}</span>
                         </div>
@@ -177,9 +183,7 @@
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-{% endblock %}
+
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>

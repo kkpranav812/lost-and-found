@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
 from services.db import query_all, query_one, execute, DatabaseError
 from services.auth_service import login_required, get_session_user_id
 from services.notification_service import notify_new_claim, notify_claim_status

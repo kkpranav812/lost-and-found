@@ -51,10 +51,15 @@ def register():
         last_name  = request.form.get("last_name", "").strip()
         email      = request.form.get("email", "").strip()
         password   = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
         phone      = request.form.get("phone", "").strip() or None
 
-        if not all([first_name, last_name, email, password]):
+        if not all([first_name, last_name, email, password, confirm_password]):
             flash("All fields are required.", "error")
+            return render_template("auth/register.html")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
             return render_template("auth/register.html")
 
         try:
@@ -70,15 +75,8 @@ def register():
             flash("Something went wrong. Please try again.", "error")
             return render_template("auth/register.html")
 
-        # Auto-login after successful registration
-        create_session({
-            "id":         new_user_id,
-            "first_name": first_name,
-            "role":       "user",
-            "email":      email,
-        })
-        flash(f"Welcome, {first_name}! Your account has been created.", "success")
-        return redirect(url_for("dashboard"))
+        flash("Your account has been created successfully. Please log in to continue.", "success")
+        return redirect(url_for("auth.login"))
 
     return render_template("auth/register.html")
 
@@ -190,3 +188,11 @@ def change_password_view():
 def unverified():
     """Page shown to users who have not verified their email yet."""
     return render_template("auth/unverified.html")
+
+
+@auth_bp.route("/resend-verification", methods=["POST"])
+@login_required
+def resend_verification():
+    """Resend verification email placeholder."""
+    flash(f"Verification link successfully resent to {session.get('email')}.", "success")
+    return redirect(url_for("auth.unverified"))

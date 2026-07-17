@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Lost & Found Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body class="auth-body unverified-page">
+    <div class="auth-container-centered">
+        <div class="auth-card">
+            <div class="auth-form-container text-center py-4">
+                <div class="mb-4 text-warning" style="font-size: 3.5rem;">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h2>Verify Your Email</h2>
+                <p class="subtitle text-muted mb-4 font-weight-500">Please check your inbox to activate your account.</p>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mb-3 fade-in">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <p class="mb-4" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                    We sent a verification link to your email address. You must verify your email address to access the dashboard and report items.
+                </p>
+
+                <div class="d-flex flex-column gap-2">
+                    <form method="POST" action="{{ url_for('auth.resend_verification') }}">
+                        <button type="submit" class="btn btn-primary btn-block py-3 rounded-lg font-weight-600">Resend Verification Email</button>
+                    </form>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-light btn-block py-3 rounded-lg font-weight-600 text-danger mt-2">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                </div>
+            </div>
+            
+            <div class="auth-card-footer-img">
+                <img src="{{ url_for('static', filename='images/login-landscape.svg') }}" alt="Cityscape with trees">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

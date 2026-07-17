@@ -14,7 +14,7 @@ def index():
     
     # Fetch all conversations for the user
     query = """
-        SELECT c.*, i.title as item_title, i.status as item_status, i.primary_image,
+        SELECT c.*, i.title as item_title, i.status as item_status, (SELECT image_url FROM item_images img WHERE img.item_id = i.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as primary_image,
                u1.first_name as u1_first, u1.last_name as u1_last, u1.id as u1_id,
                u2.first_name as u2_first, u2.last_name as u2_last, u2.id as u2_id,
                (SELECT content FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,

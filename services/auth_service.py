@@ -531,8 +531,19 @@ def inject_current_user() -> Dict[str, Any]:
             <a href="/admin">Admin Panel</a>
         {% endif %}
     """
+    current_user = get_current_user()
+    my_posts_count = 0
+    if current_user:
+        try:
+            res = query_one("SELECT COUNT(*) as count FROM items WHERE user_id = %s", (current_user["id"],))
+            if res:
+                my_posts_count = res.get("count", 0)
+        except Exception as e:
+            logger.error(f"Error getting my posts count: {e}")
+            
     return {
-        "current_user": get_current_user(),
+        "current_user": current_user,
         "is_admin_user": is_admin(),
         "is_authenticated": is_authenticated(),
+        "my_posts_count": my_posts_count,
     }

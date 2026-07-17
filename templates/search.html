@@ -14,7 +14,9 @@
     
     <form action="{{ url_for('items.search') }}" method="GET" class="main-search-form mt-4" id="mainSearchForm">
         <!-- Preserve other filters -->
-        <input type="hidden" name="type" value="{{ current_type or '' }}">
+        {% if current_type %}
+        <input type="hidden" name="type" value="{{ current_type }}">
+        {% endif %}
         
         <input type="text" name="q" placeholder="Search by keywords (e.g. Blue Backpack, iPhone 13)..." value="{{ q }}" class="form-control" autocomplete="off">
         
@@ -31,7 +33,7 @@
     </form>
 </div>
 
-<div class="row d-flex flex-wrap gap-4" style="flex-wrap: nowrap;">
+<div class="row d-flex flex-wrap gap-4">
     <!-- Filter Sidebar -->
     <aside class="col-md-3" style="min-width: 260px;">
         <div class="filter-panel">
@@ -42,8 +44,12 @@
             
             <form action="{{ url_for('items.search') }}" method="GET" id="filterForm">
                 <!-- Preserve search query -->
+                {% if q %}
                 <input type="hidden" name="q" value="{{ q }}">
-                <input type="hidden" name="category" value="{{ current_category or '' }}">
+                {% endif %}
+                {% if current_category %}
+                <input type="hidden" name="category" value="{{ current_category }}">
+                {% endif %}
                 
                 <div class="filter-group">
                     <label>Item Type</label>

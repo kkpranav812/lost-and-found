@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastNameInput = registerForm.querySelector('input[name="last_name"]');
         const emailInput = registerForm.querySelector('input[name="email"]');
         const passwordInput = registerForm.querySelector('input[name="password"]');
+        const confirmPasswordInput = registerForm.querySelector('input[name="confirm_password"]');
         const phoneInput = registerForm.querySelector('input[name="phone"]');
 
         // Create password feedback element dynamically
@@ -142,12 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const lastName = lastNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
             const phone = phoneInput ? phoneInput.value.trim() : '';
 
             // Basic checks
-            if (!firstName || !lastName || !email || !password) {
+            if (!firstName || !lastName || !email || !password || !confirmPassword) {
                 e.preventDefault();
                 showAlert(registerForm, 'Please fill in all required fields.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showAlert(registerForm, 'Passwords do not match.');
                 return;
             }
 

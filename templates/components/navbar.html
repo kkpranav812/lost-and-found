@@ -4,10 +4,12 @@
         
         <!-- Left Side: Toggle & Brand -->
         <div class="nav-brand">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="sidebarToggle" class="btn btn-icon d-lg-none me-2" style="background:none; border:none; color:var(--text-muted);">
+            <!-- Sidebar Toggle -->
+            {% if is_authenticated %}
+            <button id="sidebarToggle" class="btn btn-icon me-2" style="background:none; border:none; color:var(--text-muted);">
                 <i class="fas fa-bars"></i>
             </button>
+            {% endif %}
             <div class="brand-icon-box" style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),#4f46e5);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
                 <i class="fas fa-search-location"></i>
             </div>
@@ -24,30 +26,45 @@
         
         <!-- Right Side: User Actions -->
         <div class="nav-right">
-            <a href="{{ url_for('items.report_found') }}" class="btn btn-primary btn-sm d-none d-md-flex">
-                <i class="fas fa-plus"></i> Report Found Item
-            </a>
-            
-            <a href="{{ url_for('notifications.list_notifications') }}" class="nav-icon" id="notificationLink">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-danger" id="notificationBadge" style="display: none;">0</span>
-            </a>
-            
-            <a href="{{ url_for('chat.index') }}" class="nav-icon">
-                <i class="far fa-comment-dots"></i>
-            </a>
-            
-            <div class="user-dropdown-toggle ms-2" style="cursor:pointer;">
-                <div class="avatar">
-                    {% if current_user %}
-                        {{ current_user.first_name[0] | upper }}
-                    {% else %}
-                        U
-                    {% endif %}
+            {% if is_authenticated %}
+                <a href="{{ url_for('items.report_found') }}" class="btn btn-primary btn-sm d-none d-md-flex">
+                    <i class="fas fa-plus"></i> Report Found Item
+                </a>
+                
+                <a href="{{ url_for('notifications.list_notifications') }}" class="nav-icon" id="notificationLink">
+                    <i class="far fa-bell"></i>
+                    <span class="badge badge-danger" id="notificationBadge" style="display: none;">0</span>
+                </a>
+                
+                <a href="{{ url_for('chat.index') }}" class="nav-icon">
+                    <i class="far fa-comment-dots"></i>
+                </a>
+                
+                <div class="user-dropdown position-relative ms-2">
+                    <div class="user-dropdown-toggle" style="cursor:pointer;" id="userDropdownBtn">
+                        <div class="avatar">
+                            {% if current_user %}
+                                {{ current_user.first_name[0] | upper }}
+                            {% else %}
+                                U
+                            {% endif %}
+                        </div>
+                        <span class="d-none d-sm-inline">{{ current_user.first_name if current_user else 'User' }}</span>
+                        <i class="fas fa-chevron-down text-small text-muted ms-1"></i>
+                    </div>
+                    
+                    <div class="dropdown-menu" id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 180px; z-index: 1000; padding: 0.5rem 0; margin-top: 0.5rem;">
+                        <a href="{{ url_for('dashboard') }}" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; color: var(--text-main);"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+                        <a href="{{ url_for('my_posts') }}" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; color: var(--text-main);"><i class="far fa-list-alt me-2"></i> My Posts</a>
+                        <a href="{{ url_for('auth.change_password_view') }}" class="dropdown-item" style="display: block; padding: 0.5rem 1rem; color: var(--text-main);"><i class="fas fa-key me-2"></i> Password</a>
+                        <div style="border-top: 1px solid var(--border-light); margin: 0.5rem 0;"></div>
+                        <a href="{{ url_for('auth.logout') }}" class="dropdown-item text-danger" style="display: block; padding: 0.5rem 1rem; color: var(--danger);"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+                    </div>
                 </div>
-                <span class="d-none d-sm-inline">{{ current_user.first_name if current_user else 'User' }}</span>
-                <i class="fas fa-chevron-down text-small text-muted ms-1"></i>
-            </div>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm me-2">Log In</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a>
+            {% endif %}
         </div>
     </div>
 </nav>

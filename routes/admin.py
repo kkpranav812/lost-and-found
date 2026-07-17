@@ -65,7 +65,7 @@ def items():
     sql = """
         SELECT i.id, i.title, i.status, i.type, i.created_at, u.email as reporter_email, c.name as category_name
         FROM items i
-        LEFT JOIN users u ON i.reporter_id = u.id
+        LEFT JOIN users u ON i.user_id = u.id
         LEFT JOIN categories c ON i.category_id = c.id
         ORDER BY i.created_at DESC
     """

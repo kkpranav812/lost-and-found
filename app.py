@@ -9,8 +9,38 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+is_dev = os.environ.get('FLASK_ENV', 'development') == 'development'
+
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 if is_dev else 31536000
 app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_change_me_later')
+
+# Create bundled static assets to reduce HTTP requests for common CSS/JS.
+def _create_bundle_file(bundle_path, source_paths):
+    os.makedirs(os.path.dirname(bundle_path), exist_ok=True)
+    try:
+        with open(bundle_path, 'w', encoding='utf-8') as bundle_file:
+            for source in source_paths:
+                source_path = os.path.join(app.static_folder, source)
+                if os.path.exists(source_path):
+                    bundle_file.write(f"/* {source} */\n")
+                    with open(source_path, 'r', encoding='utf-8') as src_file:
+                        bundle_file.write(src_file.read())
+                        bundle_file.write("\n\n")
+    except OSError as exc:
+        app.logger.warning('Could not write static bundle %s: %s', bundle_path, exc)
+
+css_bundle_path = os.path.join(app.static_folder, 'css', 'bundle.css')
+js_bundle_path = os.path.join(app.static_folder, 'js', 'bundle.js')
+landing_css_bundle_path = os.path.join(app.static_folder, 'css', 'landing.bundle.css')
+
+
+if is_dev or not os.path.exists(css_bundle_path):
+    _create_bundle_file(css_bundle_path, ['css/style.css', 'css/sidebar.css', 'css/responsive.css'])
+if is_dev or not os.path.exists(js_bundle_path):
+    _create_bundle_file(js_bundle_path, ['js/app.js', 'js/notifications.js'])
+if is_dev or not os.path.exists(landing_css_bundle_path):
+    _create_bundle_file(landing_css_bundle_path, ['css/style.css', 'css/landing.css'])
 
 # Initialize extensions
 from extensions import socketio
@@ -39,13 +69,6 @@ app.register_blueprint(admin_bp)
 from services.auth_service import inject_current_user, login_required, get_session_user_id
 app.context_processor(inject_current_user)
 
-# Mock Data
-MOCK_USER = {
-    'id': 1,
-    'first_name': 'Prof',
-    'last_name': 'Smith',
-    'email': 'prof@university.edu'
-}
 
 @app.route('/')
 def landing():
@@ -80,7 +103,7 @@ def dashboard():
     
     # ── Fetch Recent Activity ──
     recent_activities = query_all("""
-        SELECT type, title as item_name, location_text as location, created_at
+        SELECT id, type, title as item_name, location_text as location, created_at
         FROM items
         ORDER BY created_at DESC LIMIT 5
     """)
@@ -95,20 +118,6 @@ def dashboard():
     ]
     
     return render_template('dashboard.html', stats=stats, recent_activities=recent_activities, recent_notifications=recent_notifications)
-
-@app.route('/chat')
-def chat():
-    contacts = [
-        {'conversation_id': 1, 'other_user_name': 'Alice Smith', 'unread_count': 2, 'last_message': 'Is this your phone?', 'last_message_time': '10:30 AM'},
-        {'conversation_id': 2, 'other_user_name': 'Bob Jones', 'unread_count': 0, 'last_message': 'Thanks for returning my keys.', 'last_message_time': 'Yesterday'}
-    ]
-    current_conv = {'id': 1, 'other_user_name': 'Alice Smith', 'item_id': 1, 'item_title': 'iPhone 13 Pro'}
-    messages = [
-        {'sender_id': 2, 'content': 'Hi, I saw your post about the iPhone.', 'created_at': '10:25 AM'},
-        {'sender_id': session.get('user_id', 1), 'content': 'Yes! Did you find it?', 'created_at': '10:28 AM'},
-        {'sender_id': 2, 'content': 'Is this your phone?', 'created_at': '10:30 AM'}
-    ]
-    return render_template('chat.html', contacts=contacts, current_conversation=current_conv, messages=messages)
 
 @app.route('/my-posts')
 @login_required
@@ -164,6 +173,15 @@ def admin_categories():
 # Dummy template filter
 @app.template_filter('date_format')
 def date_format(value): return value.strftime('%Y-%m-%d') if isinstance(value, datetime) else value
+
+@app.after_request
+def add_static_cache_headers(response):
+    if request.path.startswith('/static/') and response.status_code == 200:
+        if os.environ.get('FLASK_ENV', 'development') == 'development':
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        else:
+            response.headers.setdefault('Cache-Control', 'public, max-age=86400')
+    return response
 
 if __name__ == '__main__':
     # Make static and template folders if they don't exist
