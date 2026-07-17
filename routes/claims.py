@@ -136,6 +136,28 @@ def update_claim_status(claim_id):
         if new_status == 'approved':
             execute("UPDATE items SET status = 'resolved' WHERE id = %s", (claim['item_id'],))
             
+            # Find counterpart matched item and resolve it too, marking match as verified
+            claim_item = query_one("SELECT type FROM items WHERE id = %s", (claim['item_id'],))
+            if claim_item:
+                if claim_item['type'] == 'found':
+                    matched_item = query_one("""
+                        SELECT lost_item_id FROM item_matches m
+                        JOIN items i ON m.lost_item_id = i.id
+                        WHERE m.found_item_id = %s AND i.user_id = %s
+                    """, (claim['item_id'], claim['claimant_id']))
+                    if matched_item:
+                        execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['lost_item_id'],))
+                        execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (matched_item['lost_item_id'], claim['item_id']))
+                else:
+                    matched_item = query_one("""
+                        SELECT found_item_id FROM item_matches m
+                        JOIN items i ON m.found_item_id = i.id
+                        WHERE m.lost_item_id = %s AND i.user_id = %s
+                    """, (claim['item_id'], claim['claimant_id']))
+                    if matched_item:
+                        execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['found_item_id'],))
+                        execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (claim['item_id'], matched_item['found_item_id']))
+            
         notify_claim_status(claim['claimant_id'], claim['item_title'], new_status, claim['item_id'])
             
         if wants_json:

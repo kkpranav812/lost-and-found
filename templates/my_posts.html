@@ -68,17 +68,24 @@
     </div>
 </div>
 
-<!-- Tabs for Filter -->
-<div class="posts-tabs">
-    <button class="tab-button active" data-filter="all">All Posts ({{ items|length }})</button>
-    <button class="tab-button" data-filter="open">Active Reports ({{ items | selectattr('status', 'equalto', 'open') | list | length }})</button>
-    <button class="tab-button" data-filter="resolved">Resolved Items ({{ items | selectattr('status', 'equalto', 'resolved') | list | length }})</button>
+<!-- Primary Filter Tabs: Lost vs Found -->
+<div class="posts-tabs mb-3">
+    <button class="tab-button type-tab active" data-type-filter="all">All Reports ({{ items|length }})</button>
+    <button class="tab-button type-tab" data-type-filter="lost">Lost Reports ({{ items | selectattr('type', 'equalto', 'lost') | list | length }})</button>
+    <button class="tab-button type-tab" data-type-filter="found">Found Reports ({{ items | selectattr('type', 'equalto', 'found') | list | length }})</button>
+</div>
+
+<!-- Secondary Filter Buttons: Status -->
+<div class="status-filters mb-4 d-flex gap-2">
+    <button class="btn btn-sm btn-primary status-filter-btn" data-status-filter="all">All Statuses</button>
+    <button class="btn btn-sm btn-outline-primary status-filter-btn" data-status-filter="open">Active Only</button>
+    <button class="btn btn-sm btn-outline-primary status-filter-btn" data-status-filter="resolved">Resolved Only</button>
 </div>
 
 {% if items %}
 <div class="my-posts-grid" id="myPostsGrid">
     {% for item in items %}
-    <div class="post-wrapper card" data-item-id="{{ item.id }}" data-status="{{ item.status }}">
+    <div class="post-wrapper card" data-item-id="{{ item.id }}" data-status="{{ item.status }}" data-type="{{ item.type }}">
         
         <!-- Reuse Card component, but clean card border so we wrap it inside post-wrapper -->
         {% include "components/item_card.html" %}
@@ -99,6 +106,37 @@
                 </button>
             </form>
         </div>
+
+        <!-- Matches Section -->
+        {% if item.matches %}
+        <div class="post-matches-section p-3 border-top" style="background-color: var(--border-light); border-top: 1px solid var(--border-color);">
+            <strong class="d-block mb-2 text-primary" style="font-size: 0.85rem;"><i class="fas fa-magic me-1"></i> Potential Matches ({{ item.matches|length }})</strong>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                            <th style="padding: 4px 8px; color: var(--text-muted);">Matched Item</th>
+                            <th style="padding: 4px 8px; color: var(--text-muted); text-align: right;">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in item.matches %}
+                        <tr style="border-bottom: 1px dotted var(--border-color);">
+                            <td style="padding: 6px 8px;">
+                                <a href="{{ url_for('items.item_detail', item_id=match.match_item_id) }}" class="text-decoration-none font-weight-500 text-primary">
+                                    {{ match.match_title }}
+                                </a>
+                            </td>
+                            <td style="padding: 6px 8px; text-align: right; font-weight: 600; color: var(--success);">
+                                {{ match.percentage }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

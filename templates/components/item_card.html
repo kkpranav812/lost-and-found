@@ -1,3 +1,48 @@
+{% if item.is_combined %}
+<!-- Combined Resolved Match Card -->
+<div class="item-card status-resolved" data-status="resolved" style="border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: var(--shadow-md);">
+    <div class="item-image" style="display: flex; height: 180px; overflow: hidden; position: relative;">
+        <span class="status-overlay-badge badge-success" style="z-index: 10;"><i class="fas fa-check-circle me-1"></i>Match Resolved ({{ item.percentage }}%)</span>
+        
+        <!-- Lost Image -->
+        <div style="flex: 1; height: 100%; border-right: 1px solid white; position: relative; background-color: #f1f5f9;">
+            <span style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; z-index: 5;">LOST</span>
+            {% if item.lost_image %}
+                <img src="{{ item.lost_image }}" alt="Lost" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8;"><i class="fas fa-image fa-2x"></i></div>
+            {% endif %}
+        </div>
+        
+        <!-- Found Image -->
+        <div style="flex: 1; height: 100%; position: relative; background-color: #f1f5f9;">
+            <span style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; z-index: 5;">FOUND</span>
+            {% if item.found_image %}
+                <img src="{{ item.found_image }}" alt="Found" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8;"><i class="fas fa-image fa-2x"></i></div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="item-body">
+        <div class="item-category">
+            {% if item.category_icon %}<i class="fas {{ item.category_icon }}"></i>{% endif %}
+            {{ item.category_name }}
+        </div>
+        
+        <h3 class="item-title" style="font-size: 1rem; line-height: 1.3;">
+            {{ item.title }}
+        </h3>
+        
+        <div class="match-details-container mt-2 p-2 rounded bg-light" style="font-size: 0.8rem; border-left: 3px solid var(--success);">
+            <div class="mb-1"><strong>Lost Post:</strong> <a href="{{ url_for('items.item_detail', item_id=item.lost_id) }}" class="text-decoration-none text-primary">{{ item.lost_title }}</a></div>
+            <div class="mb-1"><strong>Found Post:</strong> <a href="{{ url_for('items.item_detail', item_id=item.found_id) }}" class="text-decoration-none text-primary">{{ item.found_title }}</a></div>
+            <div class="text-muted small mt-1 italic">Successfully resolved with {{ item.percentage }}% match score.</div>
+        </div>
+    </div>
+</div>
+{% else %}
 <!-- Reusable Item Card Component -->
 <div class="item-card {% if item.status == 'resolved' %}status-resolved{% endif %}" data-item-id="{{ item.id }}" data-type="{{ item.type }}" data-status="{{ item.status }}">
     <div class="item-image">
@@ -57,5 +102,6 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 

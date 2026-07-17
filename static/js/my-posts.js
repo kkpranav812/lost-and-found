@@ -1,35 +1,54 @@
 /**
  * my-posts.js
- * handles tab filtering and delete warnings for the "My Posts" dashboard.
+ * handles tab & button filtering and delete warnings for the "My Posts" dashboard.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ── Tab Filtering ───────────────────────────────────────────────────────
-    const tabs = document.querySelectorAll('.tab-button');
+    // ── Tab & Button Filtering ─────────────────────────────────────────────
+    const typeTabs = document.querySelectorAll('.type-tab');
+    const statusBtns = document.querySelectorAll('.status-filter-btn');
     const postWrappers = document.querySelectorAll('.post-wrapper');
 
-    tabs.forEach(tab => {
+    let currentType = 'all';
+    let currentStatus = 'all';
+
+    function filterPosts() {
+        postWrappers.forEach(post => {
+            const postType = post.getAttribute('data-type');
+            const postStatus = post.getAttribute('data-status');
+
+            const typeMatch = (currentType === 'all' || postType === currentType);
+            const statusMatch = (currentStatus === 'all' || postStatus === currentStatus);
+
+            if (typeMatch && statusMatch) {
+                post.style.display = 'block';
+            } else {
+                post.style.display = 'none';
+            }
+        });
+    }
+
+    typeTabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Remove active class from all tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
+            typeTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
 
-            const filterValue = tab.getAttribute('data-filter');
+            currentType = tab.getAttribute('data-type-filter');
+            filterPosts();
+        });
+    });
 
-            postWrappers.forEach(post => {
-                const status = post.getAttribute('data-status');
-
-                if (filterValue === 'all') {
-                    post.style.display = 'block';
-                } else if (filterValue === 'open' && status === 'open') {
-                    post.style.display = 'block';
-                } else if (filterValue === 'resolved' && status === 'resolved') {
-                    post.style.display = 'block';
-                } else {
-                    post.style.display = 'none';
-                }
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            statusBtns.forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-primary');
             });
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-primary');
+
+            currentStatus = btn.getAttribute('data-status-filter');
+            filterPosts();
         });
     });
 

@@ -175,7 +175,11 @@
                     
                     <div class="notif-content">
                         <div class="notif-title">
-                            {% if notif.item_id %}
+                            {% if notif.type == 'new_claim' %}
+                                <a href="{{ url_for('claims.claim_requests') }}">{{ notif.title }}</a>
+                            {% elif notif.type == 'new_message' and notif.conversation_id %}
+                                <a href="{{ url_for('chat.view_chat', conversation_id=notif.conversation_id) }}">{{ notif.title }}</a>
+                            {% elif notif.item_id %}
                                 <a href="{{ url_for('items.item_detail', item_id=notif.item_id) }}">{{ notif.title }}</a>
                             {% else %}
                                 {{ notif.title }}

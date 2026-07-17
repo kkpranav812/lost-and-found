@@ -123,24 +123,57 @@ def dashboard():
 @login_required
 def my_posts():
     user_id = get_session_user_id()
-    from services.db import query_all
+    from services.db import query_all, query_one
     
     items = query_all("""
-        SELECT i.*, c.name as category_name, c.icon as category_icon, 
+        (SELECT i.*, c.name as category_name, c.icon as category_icon, 
                u.first_name as user_name,
                (SELECT image_url FROM item_images img WHERE img.item_id = i.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as primary_image
         FROM items i
         JOIN categories c ON i.category_id = c.id
         JOIN users u ON i.user_id = u.id
-        WHERE i.user_id = %s
-        ORDER BY i.created_at DESC
-    """, (user_id,))
+        WHERE i.user_id = %s AND i.status = 'open')
+        UNION ALL
+        (SELECT i.*, c.name as category_name, c.icon as category_icon, 
+               u.first_name as user_name,
+               (SELECT image_url FROM item_images img WHERE img.item_id = i.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as primary_image
+        FROM items i
+        JOIN categories c ON i.category_id = c.id
+        JOIN users u ON i.user_id = u.id
+        WHERE i.user_id = %s AND i.status = 'resolved'
+        ORDER BY i.created_at DESC LIMIT 3)
+        ORDER BY created_at DESC
+    """, (user_id, user_id))
     
-    # Format time / dates
+    # Format time / dates and query matches
     for item in items:
         item['created_at'] = item['created_at'].strftime("%b %d, %Y")
         if item.get('incident_date'):
             item['incident_date'] = item['incident_date'].strftime("%Y-%m-%d")
+            
+        # Query matches for this post
+        if item['type'] == 'lost':
+            matches = query_all("""
+                SELECT m.score, i.id as match_item_id, i.title as match_title, i.type as match_type, i.status as match_status
+                FROM item_matches m
+                JOIN items i ON m.found_item_id = i.id
+                WHERE m.lost_item_id = %s
+                ORDER BY m.score DESC
+            """, (item['id'],))
+        else:
+            matches = query_all("""
+                SELECT m.score, i.id as match_item_id, i.title as match_title, i.type as match_type, i.status as match_status
+                FROM item_matches m
+                JOIN items i ON m.lost_item_id = i.id
+                WHERE m.found_item_id = %s
+                ORDER BY m.score DESC
+            """, (item['id'],))
+            
+        # Format match scores as percentage
+        for match in matches:
+            match['percentage'] = int(float(match['score']) * 100) if match['score'] else 0
+            
+        item['matches'] = matches
             
     return render_template('my_posts.html', items=items)
 
