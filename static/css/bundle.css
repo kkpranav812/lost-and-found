@@ -859,8 +859,11 @@ h1, h2, h3, h4, h5, h6 {
         overflow-x: auto;
     }
 
-    /* Items Lists */
-    .items-grid {
+    /* Items & Content Grids */
+    .items-grid,
+    .claim-requests-grid,
+    .my-posts-grid,
+    .admin-stats-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 1rem;
     }
@@ -870,11 +873,11 @@ h1, h2, h3, h4, h5, h6 {
    Small Mobile Devices (max-width: 576px)
    ───────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 576px) {
-    .stats-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-    .items-grid {
+    .stats-grid,
+    .items-grid,
+    .claim-requests-grid,
+    .my-posts-grid,
+    .admin-stats-grid {
         grid-template-columns: 1fr !important;
     }
 

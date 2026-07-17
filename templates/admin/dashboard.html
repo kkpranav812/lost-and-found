@@ -29,7 +29,7 @@
         </header>
 
         <section class="admin-stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='{{ url_for('admin.users') }}'">
                 <div class="stat-icon bg-blue">
                     <i class="fas fa-users"></i>
                 </div>
@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='{{ url_for('admin.items') }}'">
                 <div class="stat-icon bg-green">
                     <i class="fas fa-box-open"></i>
                 </div>
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='{{ url_for('admin.claims') }}'">
                 <div class="stat-icon bg-yellow">
                     <i class="fas fa-handshake"></i>
                 </div>
