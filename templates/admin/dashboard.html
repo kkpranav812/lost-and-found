@@ -9,8 +9,11 @@
 <div class="admin-layout">
     <!-- Admin Sidebar -->
     <aside class="admin-sidebar">
-        <div class="admin-sidebar-header">
+        <div class="admin-sidebar-header d-flex justify-content-between align-items-center">
             <h3>Admin Panel</h3>
+            <button id="adminSidebarToggle" class="btn btn-icon btn-sm" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
         </div>
         <nav class="admin-nav">
             <a href="{{ url_for('admin.dashboard') }}" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
@@ -59,8 +62,88 @@
                 </div>
             </div>
         </section>
-
-        <!-- More dashboard widgets can be added here -->
+        
+        <section class="admin-charts-section mt-5">
+            <div class="card" style="background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); padding: 1.5rem;">
+                <h3 class="mb-4" style="color: var(--color-text-primary); font-size: 1.1rem; font-weight: 600;">Lost & Found Activity Trends (Last 6 Months)</h3>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </section>
     </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rawData = JSON.parse('{{ chart_data | safe }}');
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: rawData.labels,
+                datasets: [
+                    {
+                        label: 'Lost Items',
+                        data: rawData.lost,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#ef4444'
+                    },
+                    {
+                        label: 'Found Items',
+                        data: rawData.found,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#10b981'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: "'Poppins', sans-serif",
+                                size: 12
+                            },
+                            usePointStyle: true,
+                            boxWidth: 8
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}

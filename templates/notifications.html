@@ -145,9 +145,9 @@
             <p class="text-muted">Stay updated with claims, matches, and actions on your items.</p>
         </div>
         {% if notifications %}
-            <form action="{{ url_for('notifications.mark_all_read') }}" method="POST">
-                <button type="submit" class="btn btn-outline-primary btn-sm">
-                    <i class="fa-solid fa-check-double"></i> Mark all read
+            <form action="{{ url_for('notifications.clear_all') }}" method="POST">
+                <button type="submit" class="btn btn-outline-danger btn-sm" style="border-radius: var(--radius-md);">
+                    <i class="fa-solid fa-trash-can"></i> Clear all
                 </button>
             </form>
         {% endif %}

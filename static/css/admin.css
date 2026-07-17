@@ -1,3 +1,15 @@
+:root {
+    --color-background: var(--bg-main, #f8fafc);
+    --color-surface: var(--bg-card, #ffffff);
+    --color-border: var(--border-color, #e2e8f0);
+    --color-text-primary: var(--text-main, #0f172a);
+    --color-text-secondary: var(--text-muted, #475569);
+    --color-primary: var(--primary, #1251e6);
+    --color-primary-light: var(--primary-light, #e8efff);
+    --color-success: var(--success, #10b981);
+    --color-warning: var(--warning, #f59e0b);
+}
+
 /* Admin Layout */
 .admin-layout {
     display: flex;
@@ -12,6 +24,35 @@
     padding: 1.5rem 0;
     display: flex;
     flex-direction: column;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+/* Sidebar Collapse Transition */
+.admin-layout.collapsed .admin-sidebar {
+    width: 70px;
+}
+
+.admin-layout.collapsed .admin-sidebar .admin-sidebar-header {
+    justify-content: center !important;
+    padding: 0 0 1.5rem 0;
+}
+
+.admin-layout.collapsed .admin-sidebar h3 {
+    display: none;
+}
+
+.admin-layout.collapsed .admin-sidebar .admin-nav a {
+    justify-content: center;
+    padding: 0.75rem 0;
+}
+
+.admin-layout.collapsed .admin-sidebar .admin-nav a i {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.admin-layout.collapsed .admin-sidebar .admin-nav a {
+    font-size: 0; /* Hide text */
 }
 
 .admin-sidebar-header {

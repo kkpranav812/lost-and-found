@@ -52,7 +52,7 @@
 
 .conversation-item.active {
     background-color: #eef5ff; /* Light blue tint */
-    border-left: 4px solid var(--primary-blue);
+    border-left: 4px solid var(--primary);
 }
 
 .conv-avatar {
@@ -137,6 +137,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    background-color: var(--white);
 }
 
 .message-wrapper {
@@ -163,14 +164,14 @@
 }
 
 .message-in .message-bubble {
-    background-color: var(--white);
-    color: var(--dark-text);
+    background-color: var(--success-light);
+    color: #065f46; /* Dark green */
     border-bottom-left-radius: 4px;
-    border: 1px solid #eaeaea;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .message-out .message-bubble {
-    background-color: var(--primary-blue);
+    background-color: var(--primary);
     color: var(--white);
     border-bottom-right-radius: 4px;
 }
@@ -193,14 +194,17 @@
 
 .chat-input-area textarea {
     resize: none;
-    border-radius: 20px;
-    padding: 0.75rem 1.25rem;
+    border-radius: 24px;
+    padding: 0.9rem 1.5rem;
     border: 1px solid var(--border-color);
-    box-shadow: none;
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+    min-height: 48px;
+    line-height: 1.4;
 }
 
 .chat-input-area textarea:focus {
-    border-color: var(--primary-blue);
+    border-color: var(--primary);
     outline: none;
 }
 

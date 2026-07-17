@@ -179,6 +179,37 @@ def change_password_view():
     return render_template("auth/change_password.html")
 
 
+@auth_bp.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    """Show and edit user profile."""
+    user_id = session.get("user_id")
+    if request.method == "POST":
+        first_name = request.form.get("first_name", "").strip()
+        last_name  = request.form.get("last_name", "").strip()
+        phone      = request.form.get("phone", "").strip() or None
+        
+        if not first_name or not last_name:
+            flash("First name and Last name are required.", "error")
+        else:
+            try:
+                execute(
+                    "UPDATE users SET first_name = %s, last_name = %s, phone = %s WHERE id = %s",
+                    (first_name, last_name, phone, user_id)
+                )
+                session["first_name"] = first_name
+                session["last_name"] = last_name
+                flash("Profile updated successfully.", "success")
+                return redirect(url_for("auth.profile"))
+            except Exception:
+                current_app.logger.exception("Error updating profile")
+                flash("Could not update profile.", "error")
+                
+    from services.db import query_one
+    user = query_one("SELECT * FROM users WHERE id = %s", (user_id,))
+    return render_template("auth/profile.html", user=user)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Email unverified placeholder (referenced by verified_email_required)
 # ─────────────────────────────────────────────────────────────────────────────

@@ -35,15 +35,6 @@
         <div class="sidebar-title">My Activity</div>
         <ul class="sidebar-menu">
             <li>
-                <a href="{{ url_for('my_posts') }}" class="sidebar-link {% if request.endpoint == 'my_posts' %}active{% endif %}">
-                    <i class="far fa-list-alt"></i>
-                    <span class="text">My Posts</span>
-                    {% if my_posts_count is defined and my_posts_count > 0 %}
-                    <span class="sidebar-badge">{{ my_posts_count }}</span>
-                    {% endif %}
-                </a>
-            </li>
-            <li>
                 <a href="{{ url_for('claims.my_claims') }}" class="sidebar-link {% if request.endpoint == 'claims.my_claims' %}active{% endif %}">
                     <i class="far fa-handshake"></i>
                     <span class="text">My Claims</span>
@@ -80,12 +71,6 @@
 
     <div class="sidebar-section mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
         <ul class="sidebar-menu">
-            <li>
-                <a href="{{ url_for('auth.change_password_view') }}" class="sidebar-link">
-                    <i class="fas fa-key"></i>
-                    <span class="text">Change Password</span>
-                </a>
-            </li>
             <li>
                 <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-danger">
                     <i class="fas fa-sign-out-alt"></i>

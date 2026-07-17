@@ -50,24 +50,23 @@ def mark_read(notif_id):
         current_app.logger.error(f"Error marking notification {notif_id} as read: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@notifications_bp.route('/notifications/mark-all-read', methods=['POST'])
+@notifications_bp.route('/notifications/clear-all', methods=['POST'])
 @login_required
-def mark_all_read():
+def clear_all():
     """
-    Marks all notifications for the user as read.
+    Deletes all notifications for the user.
     """
     user_id = get_session_user_id()
     try:
         execute("""
-            UPDATE notifications 
-            SET is_read = 1 
+            DELETE FROM notifications 
             WHERE user_id = %s
         """, (user_id,))
-        flash("All notifications marked as read.", "success")
+        flash("All notifications cleared.", "success")
         return redirect(url_for('notifications.list_notifications'))
     except DatabaseError as e:
-        current_app.logger.error(f"Error marking all notifications as read: {e}")
-        flash("Could not mark notifications as read.", "error")
+        current_app.logger.error(f"Error clearing all notifications: {e}")
+        flash("Could not clear notifications.", "error")
         return redirect(url_for('notifications.list_notifications'))
 
 @notifications_bp.route('/notifications/delete/<int:notif_id>', methods=['POST'])

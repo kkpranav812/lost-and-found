@@ -91,4 +91,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Admin Sidebar Collapse Toggle
+    const adminSidebarToggle = document.getElementById('adminSidebarToggle');
+    const adminLayout = document.querySelector('.admin-layout');
+    
+    if (localStorage.getItem('adminSidebarCollapsed') === 'true') {
+        if (adminLayout) adminLayout.classList.add('collapsed');
+        if (adminSidebarToggle) {
+            const icon = adminSidebarToggle.querySelector('i');
+            if (icon) icon.className = 'fas fa-chevron-right';
+        }
+    }
+
+    if (adminSidebarToggle && adminLayout) {
+        adminSidebarToggle.addEventListener('click', () => {
+            adminLayout.classList.toggle('collapsed');
+            const isCollapsed = adminLayout.classList.contains('collapsed');
+            localStorage.setItem('adminSidebarCollapsed', isCollapsed);
+            
+            const icon = adminSidebarToggle.querySelector('i');
+            if (icon) {
+                if (isCollapsed) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            }
+        });
+    }
 });
