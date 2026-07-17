@@ -66,6 +66,17 @@
     --navbar-height: 70px;
     --sidebar-width: 260px;
     --sidebar-width-collapsed: 80px;
+
+    /* Legacy/Responsive CSS variable mappings */
+    --color-primary: var(--primary);
+    --color-primary-light: var(--primary-light);
+    --color-background: var(--bg-main);
+    --color-surface: var(--bg-card);
+    --color-border: var(--border-color);
+    --color-text-primary: var(--text-main);
+    --color-text-secondary: var(--text-muted);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
 }
 
 * {
