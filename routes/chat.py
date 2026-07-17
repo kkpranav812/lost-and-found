@@ -129,7 +129,7 @@ def start_chat(item_id):
         
     if item['user_id'] == user_id:
         flash("You cannot start a chat with yourself about your own item.", "warning")
-        return redirect(url_for('items.item_detail', id=item_id))
+        return redirect(url_for('items.item_detail', item_id=item_id))
         
     # Check if conversation already exists
     # Make sure we check both permutations of user1, user2
