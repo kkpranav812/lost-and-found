@@ -105,7 +105,7 @@ def dashboard():
     recent_activities = query_all("""
         SELECT id, type, title as item_name, location_text as location, created_at
         FROM items
-        ORDER BY created_at DESC LIMIT 5
+        ORDER BY created_at DESC LIMIT 10
     """)
     
     # Format time_ago in python or jinja. We will pass raw dates and use a simple filter.

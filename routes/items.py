@@ -90,7 +90,13 @@ def search():
         current_app.logger.error(f"Search count error: {e}")
         total_items = 0
         
-    total_pages = math.ceil(total_items / per_page)
+    if status == 'resolved':
+        per_page = 3
+        total_items = min(total_items, 3)
+        total_pages = 1
+        offset = 0
+    else:
+        total_pages = math.ceil(total_items / per_page)
     
     # Final data query
     order_sql = " ORDER BY i.created_at DESC LIMIT %s OFFSET %s"
