@@ -137,8 +137,11 @@ def update_claim_status(claim_id):
             execute("UPDATE items SET status = 'resolved' WHERE id = %s", (claim['item_id'],))
             
             # Find counterpart matched item and resolve it too, marking match as verified
-            claim_item = query_one("SELECT type, category_id FROM items WHERE id = %s", (claim['item_id'],))
+            claim_item = query_one("SELECT type, category_id, latitude, longitude FROM items WHERE id = %s", (claim['item_id'],))
             if claim_item:
+                lat = float(claim_item['latitude']) if claim_item['latitude'] is not None else None
+                lng = float(claim_item['longitude']) if claim_item['longitude'] is not None else None
+                
                 if claim_item['type'] == 'found':
                     matched_item = query_one("""
                         SELECT lost_item_id FROM item_matches m
@@ -148,12 +151,23 @@ def update_claim_status(claim_id):
                     if matched_item:
                         execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['lost_item_id'],))
                     else:
-                        # Fallback: Find claimant's open lost item in same category
-                        fallback_item = query_one("""
-                            SELECT id FROM items 
-                            WHERE user_id = %s AND category_id = %s AND type = 'lost' AND status = 'open'
-                            ORDER BY created_at DESC LIMIT 1
-                        """, (claim['claimant_id'], claim_item['category_id']))
+                        # Fallback: Find claimant's open lost item in same category, ordered by proximity
+                        if lat is not None and lng is not None:
+                            fallback_item = query_one("""
+                                SELECT id FROM items 
+                                WHERE user_id = %s AND category_id = %s AND type = 'lost' AND status = 'open'
+                                ORDER BY 
+                                    (CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN (POW(latitude - %s, 2) + POW(longitude - %s, 2)) ELSE 999999 END) ASC,
+                                    created_at DESC
+                                LIMIT 1
+                            """, (claim['claimant_id'], claim_item['category_id'], lat, lng))
+                        else:
+                            fallback_item = query_one("""
+                                SELECT id FROM items 
+                                WHERE user_id = %s AND category_id = %s AND type = 'lost' AND status = 'open'
+                                ORDER BY created_at DESC
+                                LIMIT 1
+                            """, (claim['claimant_id'], claim_item['category_id']))
                         if fallback_item:
                             execute("UPDATE items SET status = 'resolved' WHERE id = %s", (fallback_item['id'],))
                 else:
@@ -165,12 +179,23 @@ def update_claim_status(claim_id):
                     if matched_item:
                         execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['found_item_id'],))
                     else:
-                        # Fallback: Find claimant's open found item in same category
-                        fallback_item = query_one("""
-                            SELECT id FROM items 
-                            WHERE user_id = %s AND category_id = %s AND type = 'found' AND status = 'open'
-                            ORDER BY created_at DESC LIMIT 1
-                        """, (claim['claimant_id'], claim_item['category_id']))
+                        # Fallback: Find claimant's open found item in same category, ordered by proximity
+                        if lat is not None and lng is not None:
+                            fallback_item = query_one("""
+                                SELECT id FROM items 
+                                WHERE user_id = %s AND category_id = %s AND type = 'found' AND status = 'open'
+                                ORDER BY 
+                                    (CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN (POW(latitude - %s, 2) + POW(longitude - %s, 2)) ELSE 999999 END) ASC,
+                                    created_at DESC
+                                LIMIT 1
+                            """, (claim['claimant_id'], claim_item['category_id'], lat, lng))
+                        else:
+                            fallback_item = query_one("""
+                                SELECT id FROM items 
+                                WHERE user_id = %s AND category_id = %s AND type = 'found' AND status = 'open'
+                                ORDER BY created_at DESC
+                                LIMIT 1
+                            """, (claim['claimant_id'], claim_item['category_id']))
                         if fallback_item:
                             execute("UPDATE items SET status = 'resolved' WHERE id = %s", (fallback_item['id'],))
             
