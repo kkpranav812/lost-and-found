@@ -99,7 +99,9 @@ async function updateUnreadCount() {
     if (!badge) return;
     
     try {
-        const response = await fetch('/notifications/unread-count');
+        const response = await fetch('/notifications/unread-count', {
+            cache: 'no-store'
+        });
         if (response.ok) {
             const data = await response.json();
             const count = data.unread_count || 0;
