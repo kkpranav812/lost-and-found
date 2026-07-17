@@ -148,7 +148,7 @@ def start_chat(item_id):
     conv_id = execute("""
         INSERT INTO conversations (item_id, user_one_id, user_two_id)
         VALUES (%s, %s, %s)
-    """, (item_id, user_one_id, user_two_id))
+    """, (item_id, user_one_id, user_two_id), return_lastrowid=True)
     
     return redirect(url_for('chat.view_chat', conversation_id=conv_id))
 

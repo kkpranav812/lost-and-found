@@ -93,15 +93,11 @@ def _build_db_config() -> Dict[str, Any]:
             config["ssl_key"] = ssl_key
         logger.info("SSL enabled: CA=%s, mTLS=%s", ssl_ca, bool(ssl_cert))
     else:
-        # No CA provided — allow connection but warn loudly in non-production
-        if os.environ.get("FLASK_ENV") == "production":
-            raise RuntimeError(
-                "DB_SSL_CA must be set in production to enforce Aiven SSL. "
-                "Download ca.pem from the Aiven console."
-            )
+        # No CA provided — skip SSL verification.
+        # Railway MySQL does not require SSL certificates.
         logger.warning(
-            "DB_SSL_CA not set — SSL verification disabled. "
-            "Set DB_SSL_CA=/path/to/ca.pem for Aiven connections."
+            "DB_SSL_CA not set — running without SSL certificate verification. "
+            "This is acceptable for Railway/internal MySQL connections."
         )
 
     return config
