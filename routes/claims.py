@@ -147,7 +147,6 @@ def update_claim_status(claim_id):
                     """, (claim['item_id'], claim['claimant_id']))
                     if matched_item:
                         execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['lost_item_id'],))
-                        execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (matched_item['lost_item_id'], claim['item_id']))
                 else:
                     matched_item = query_one("""
                         SELECT found_item_id FROM item_matches m
@@ -156,7 +155,6 @@ def update_claim_status(claim_id):
                     """, (claim['item_id'], claim['claimant_id']))
                     if matched_item:
                         execute("UPDATE items SET status = 'resolved' WHERE id = %s", (matched_item['found_item_id'],))
-                        execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (claim['item_id'], matched_item['found_item_id']))
             
         notify_claim_status(claim['claimant_id'], claim['item_title'], new_status, claim['item_id'])
             

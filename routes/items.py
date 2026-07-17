@@ -364,7 +364,6 @@ def resolve_item(item_id):
                 """, (item_id,))
                 if match:
                     execute("UPDATE items SET status = 'resolved' WHERE id = %s", (match['found_item_id'],))
-                    execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (item_id, match['found_item_id']))
             else:
                 match = query_one("""
                     SELECT lost_item_id FROM item_matches 
@@ -373,7 +372,6 @@ def resolve_item(item_id):
                 """, (item_id,))
                 if match:
                     execute("UPDATE items SET status = 'resolved' WHERE id = %s", (match['lost_item_id'],))
-                    execute("UPDATE item_matches SET status = 'verified' WHERE lost_item_id = %s AND found_item_id = %s", (match['lost_item_id'], item_id))
                     
         flash("Item successfully marked as resolved!", "success")
     except DatabaseError as e:
