@@ -11,7 +11,6 @@ import math
 from services.db import get_db, query_one, query_all, execute, DatabaseError
 from services.auth_service import login_required, get_session_user_id, verified_email_required
 from services.cloudinary_service import validate_image, upload_image, delete_image
-from services.notification_service import check_and_notify_matches
 
 items_bp = Blueprint('items', __name__)
 
@@ -90,89 +89,17 @@ def search():
         current_app.logger.error(f"Search count error: {e}")
         total_items = 0
         
-    items = []
-    if status == 'resolved':
-        # Query resolved matches
-        resolved_matches = query_all("""
-            SELECT m.id as match_id, m.score,
-                   lost.id as lost_id, lost.title as lost_title, lost.description as lost_description,
-                   lost.created_at as lost_created_at,
-                   found.id as found_id, found.title as found_title, found.description as found_description,
-                   (SELECT image_url FROM item_images img WHERE img.item_id = lost.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as lost_image,
-                   (SELECT image_url FROM item_images img WHERE img.item_id = found.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as found_image,
-                   c.name as category_name, c.icon as category_icon
-            FROM item_matches m
-            JOIN items lost ON m.lost_item_id = lost.id
-            JOIN items found ON m.found_item_id = found.id
-            JOIN categories c ON lost.category_id = c.id
-            WHERE lost.status = 'resolved' AND found.status = 'resolved'
-            ORDER BY m.created_at DESC
-            LIMIT 3
-        """)
-        
-        # Convert to virtual combined items
-        combined_items = []
-        matched_item_ids = set()
-        for rm in resolved_matches:
-            matched_item_ids.add(rm['lost_id'])
-            matched_item_ids.add(rm['found_id'])
-            
-            percentage = int(float(rm['score']) * 100) if rm['score'] else 0
-            combined_items.append({
-                'is_combined': True,
-                'match_id': rm['match_id'],
-                'percentage': percentage,
-                'title': f"Resolved Match: {rm['lost_title']} & {rm['found_title']}",
-                'category_name': rm['category_name'],
-                'category_icon': rm['category_icon'],
-                'lost_id': rm['lost_id'],
-                'lost_title': rm['lost_title'],
-                'lost_description': rm['lost_description'],
-                'lost_image': rm['lost_image'],
-                'found_id': rm['found_id'],
-                'found_title': rm['found_title'],
-                'found_description': rm['found_description'],
-                'found_image': rm['found_image'],
-                'status': 'resolved',
-                'created_at': rm['lost_created_at']
-            })
-            
-        # Fetch single resolved items not in matches
-        single_resolved = []
-        if len(combined_items) < 3:
-            limit_rem = 3 - len(combined_items)
-            query_str = """
-                SELECT i.*, c.name as category_name, c.icon as category_icon, 
-                       u.first_name as user_name, u.avatar_url,
-                       (SELECT image_url FROM item_images img WHERE img.item_id = i.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as primary_image
-                FROM items i
-                JOIN categories c ON i.category_id = c.id
-                JOIN users u ON i.user_id = u.id
-                WHERE i.status = 'resolved'
-            """
-            if matched_item_ids:
-                query_str += f" AND i.id NOT IN ({','.join(map(str, matched_item_ids))})"
-            query_str += " ORDER BY i.created_at DESC LIMIT %s"
-            single_resolved_raw = query_all(query_str, (limit_rem,))
-            for sr in single_resolved_raw:
-                sr['is_combined'] = False
-                single_resolved.append(sr)
-                
-        items = combined_items + single_resolved
-        total_items = len(items)
-        total_pages = 1
-    else:
-        total_pages = math.ceil(total_items / per_page)
-        
-        # Final data query
-        order_sql = " ORDER BY i.created_at DESC LIMIT %s OFFSET %s"
-        data_params = params + [per_page, offset]
-        
-        try:
-            items = query_all(select_clause + where_sql + order_sql, tuple(data_params))
-        except DatabaseError as e:
-            current_app.logger.error(f"Search data error: {e}")
-            items = []
+    total_pages = math.ceil(total_items / per_page)
+    
+    # Final data query
+    order_sql = " ORDER BY i.created_at DESC LIMIT %s OFFSET %s"
+    data_params = params + [per_page, offset]
+    
+    try:
+        items = query_all(select_clause + where_sql + order_sql, tuple(data_params))
+    except DatabaseError as e:
+        current_app.logger.error(f"Search data error: {e}")
+        items = []
         
     return render_template('search.html', 
                            items=items, 
@@ -231,6 +158,8 @@ def report_found():
 
 def _handle_report(req, item_type):
     """Shared logic for creating lost and found items."""
+    from services.notification_service import notify_match_found
+
     categories = get_categories()
     
     if req.method == 'POST':
@@ -249,7 +178,7 @@ def _handle_report(req, item_type):
             return render_template(f'report_{item_type}.html', categories=categories)
             
         try:
-            # 1. Insert Item
+            # 1. Insert Item — use correct DB column names: latitude, longitude
             item_id = execute(
                 """
                 INSERT INTO items (user_id, category_id, title, description, type, status, location_text, latitude, longitude, incident_date)
@@ -259,32 +188,70 @@ def _handle_report(req, item_type):
                 return_lastrowid=True
             )
             
-            # 2. Handle Image Uploads
+            # 2. Handle Image Uploads (up to 5 images)
             if 'images' in req.files:
                 files = req.files.getlist('images')
+                uploaded_count = 0
                 for i, file in enumerate(files):
+                    if uploaded_count >= 5:
+                        break
                     if file and file.filename:
                         is_valid, error = validate_image(file)
                         if is_valid:
                             upload_result = upload_image(file)
                             if upload_result:
-                                is_primary = 1 if i == 0 else 0
+                                is_primary = 1 if uploaded_count == 0 else 0
                                 execute(
                                     "INSERT INTO item_images (item_id, image_url, public_id, is_primary, sort_order) VALUES (%s, %s, %s, %s, %s)",
-                                    (item_id, upload_result['url'], upload_result['public_id'], is_primary, i)
+                                    (item_id, upload_result['url'], upload_result['public_id'], is_primary, uploaded_count)
                                 )
+                                uploaded_count += 1
                         else:
                             current_app.logger.warning(f"Image upload skipped for {file.filename}: {error}")
-                            
-            # 3. Scan for matches
-            try:
-                matches_count = check_and_notify_matches(item_id)
-                if matches_count > 0:
-                    flash(f"We found {matches_count} potential match(es) for your item! Please check your notifications.", "info")
-            except Exception as match_err:
-                current_app.logger.error(f"Error checking matches: {match_err}")
 
-            flash(f"Your {item_type} item has been successfully reported!", "success")
+            # 3. Match Notifications
+            # Determine the opposite type to scan for potential matches
+            opposite_type = 'lost' if item_type == 'found' else 'found'
+            
+            # Find open items in the same category of the opposite type
+            potential_matches = query_all("""
+                SELECT i.id, i.title, i.user_id
+                FROM items i
+                WHERE i.type = %s
+                  AND i.status = 'open'
+                  AND i.category_id = %s
+                  AND i.user_id != %s
+                LIMIT 10
+            """, (opposite_type, category_id, user_id))
+
+            if item_type == 'found':
+                # Notify the owners of open LOST items that a potential match was found
+                for match in potential_matches:
+                    notify_match_found(
+                        user_id=match['user_id'],
+                        item_title=match['title'],
+                        matched_title=title,
+                        item_id=match['id']
+                    )
+                if potential_matches:
+                    flash(
+                        f"✅ Your found item was reported! We found {len(potential_matches)} potential "
+                        f"match(es) — the owner(s) have been notified.",
+                        "success"
+                    )
+                else:
+                    flash("Your found item has been successfully reported! We'll alert you when a match is found.", "success")
+            else:
+                # For lost items: tell the reporter if existing found items match
+                if potential_matches:
+                    flash(
+                        f"✅ Your lost item was reported! We found {len(potential_matches)} existing found "
+                        f"item(s) in this category — check them out on the search page!",
+                        "success"
+                    )
+                else:
+                    flash("Your lost item has been successfully reported! We'll alert you when a match is found.", "success")
+
             return redirect(url_for('items.item_detail', item_id=item_id))
             
         except Exception as e:
@@ -352,27 +319,6 @@ def resolve_item(item_id):
         
     try:
         execute("UPDATE items SET status = 'resolved' WHERE id = %s", (item_id,))
-        
-        # Check if there is a match and mark the counterpart as resolved too
-        item_details = query_one("SELECT type FROM items WHERE id = %s", (item_id,))
-        if item_details:
-            if item_details['type'] == 'lost':
-                match = query_one("""
-                    SELECT found_item_id FROM item_matches 
-                    WHERE lost_item_id = %s 
-                    ORDER BY score DESC LIMIT 1
-                """, (item_id,))
-                if match:
-                    execute("UPDATE items SET status = 'resolved' WHERE id = %s", (match['found_item_id'],))
-            else:
-                match = query_one("""
-                    SELECT lost_item_id FROM item_matches 
-                    WHERE found_item_id = %s 
-                    ORDER BY score DESC LIMIT 1
-                """, (item_id,))
-                if match:
-                    execute("UPDATE items SET status = 'resolved' WHERE id = %s", (match['lost_item_id'],))
-                    
         flash("Item successfully marked as resolved!", "success")
     except DatabaseError as e:
         current_app.logger.error(f"Error resolving item {item_id}: {e}")

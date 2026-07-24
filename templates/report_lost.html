@@ -10,6 +10,31 @@
     #leaflet-map { height: 280px; border-radius: var(--radius-lg); z-index: 1; margin-top: 0.75rem; border: 1px solid var(--border-color); }
     .map-toolbar { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
     .map-toolbar input { flex-grow: 1; }
+
+    /* Upload loading overlay */
+    #uploadOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.65);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        gap: 1rem;
+        backdrop-filter: blur(2px);
+    }
+    #uploadOverlay .overlay-card {
+        background: var(--bg-card, #fff);
+        color: var(--text-main, #1e293b);
+        border-radius: var(--radius-xl, 16px);
+        padding: 2.5rem 3rem;
+        text-align: center;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+    #uploadOverlay .overlay-card i { font-size: 2.5rem; color: var(--primary, #4F46E5); margin-bottom: 1rem; }
+    #uploadOverlay .overlay-card p { margin: 0.5rem 0 0; color: var(--text-muted, #64748b); font-size: 0.9rem; }
 </style>
 {% endblock %}
 
@@ -79,11 +104,11 @@
 
             <!-- Image Upload -->
             <div class="form-group">
-                <label>Upload Item Images</label>
+                <label>Upload Item Images <span style="font-weight:400; color:var(--text-muted)">(up to 5)</span></label>
                 <div class="image-upload-wrapper">
                     <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <p class="mb-1 font-weight-600">Drag & drop files or click to upload</p>
-                    <p class="upload-help-text">Supports PNG, JPG, WEBP (Max 5MB per image)</p>
+                    <p class="mb-1 font-weight-600">Drag &amp; drop files or click to upload</p>
+                    <p class="upload-help-text">PNG, JPG, WEBP · Max 5 MB each · Max 5 images</p>
                     <input type="file" name="images" multiple accept="image/*" id="imageInput">
                 </div>
                 <div id="fileList" class="mt-2 text-small text-muted"></div>
@@ -96,6 +121,15 @@
             </div>
 
         </form>
+    </div>
+</div>
+
+<!-- Upload Loading Overlay -->
+<div id="uploadOverlay">
+    <div class="overlay-card">
+        <i class="fas fa-cloud-upload-alt fa-pulse"></i>
+        <h4 style="margin:0.5rem 0 0;">Uploading your report…</h4>
+        <p>Please wait while we save your images.<br>This may take a few seconds.</p>
     </div>
 </div>
 {% endblock %}
