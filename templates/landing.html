@@ -23,7 +23,7 @@
             <div class="brand-icon-box">
                 <i class="fas fa-search-location"></i>
             </div>
-            <span>Lost & Found Portal</span>
+            <span>Lost &amp; Found Portal</span>
         </div>
         
         <div class="landing-nav-links">
@@ -34,31 +34,81 @@
         
         <div class="landing-nav-actions">
             {% if is_authenticated %}
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary rounded-full px-4">Dashboard</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary rounded-full px-4 btn-tactile">Dashboard</a>
             {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary rounded-full px-4">Log in</a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-full px-4 shadow-md">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary rounded-full px-4 btn-tactile">Log in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-full px-4 shadow-md btn-tactile">Get Started</a>
             {% endif %}
         </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <div class="hero-bg-blob"></div>
-        <div class="hero-grid">
-            <div class="hero-content">
-                <h1>Lost Something?<br>Found Something?<br><span class="text-primary">We Connect You.</span></h1>
-                <p>The smartest and fastest way to recover your lost belongings. Report lost items or list found items and let our system match you up instantly.</p>
-                <div class="hero-actions">
-                    <a href="{{ url_for('items.report_lost') }}" class="btn btn-primary btn-large shadow-md rounded-full">Report Lost Item</a>
-                    <a href="{{ url_for('items.report_found') }}" class="btn btn-outline-primary btn-large rounded-full bg-white">Report Found Item</a>
+        <div class="hero-grid-container">
+            <!-- Left Side: Content & Liquid Glass Card -->
+            <div class="hero-left-content">
+                <div class="hero-badge animate-float">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                    <span>Verified Community Matching &amp; Recovery</span>
                 </div>
                 
+                <h1 class="hero-title">
+                    Lost Something?<br>
+                    Found Something?<br>
+                    <span class="text-gradient">We Connect You.</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    The smartest and fastest way to recover your lost belongings. Search matching reports or let our system reunite you instantly.
+                </p>
 
+                <!-- Liquid Glass Search & Prompt Card -->
+                <div class="liquid-glass-wrapper">
+                    <div class="liquid-glass-card">
+                        <form action="{{ url_for('items.search') }}" method="GET" class="glass-prompt-form" id="promptSearchForm">
+                            <div class="glass-card-top">
+                                <span class="glass-pill-tag active"><i class="fas fa-search me-1"></i> Quick Search</span>
+                                <a href="{{ url_for('items.report_lost') }}" class="glass-pill-tag"><i class="fas fa-exclamation-circle me-1"></i> Report Lost</a>
+                                <a href="{{ url_for('items.report_found') }}" class="glass-pill-tag"><i class="fas fa-hand-holding-heart me-1"></i> Report Found</a>
+                            </div>
+                            
+                            <div class="glass-input-area">
+                                <textarea name="q" id="glassPromptInput" rows="2" placeholder="e.g. I lost my Blue Samsung Galaxy S21 near the library entrance..." class="glass-textarea" required></textarea>
+                            </div>
+                            
+                            <div class="glass-card-bottom">
+                                <div class="glass-bottom-left">
+                                    <a href="{{ url_for('items.report_found') }}" class="glass-icon-btn btn-tactile" title="Upload an image to report or match">
+                                        <i class="fas fa-camera"></i>
+                                    </a>
+                                    <span class="glass-hint-text d-none d-sm-inline">Instant keyword &amp; location matching</span>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary glass-cta-btn btn-tactile">
+                                    <span>Search Items</span>
+                                    <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Quick Action Links -->
+                <div class="hero-quick-actions">
+                    <a href="{{ url_for('items.report_lost') }}" class="btn btn-primary btn-large rounded-full shadow-md btn-tactile">
+                        <i class="fas fa-bullhorn me-2"></i> Report Lost Item
+                    </a>
+                    <a href="{{ url_for('items.report_found') }}" class="btn btn-outline-primary btn-large rounded-full btn-tactile">
+                        <i class="fas fa-box-open me-2"></i> Report Found Item
+                    </a>
+                </div>
             </div>
-            
-            <div class="hero-image-wrapper">
-                <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" alt="Lost items illustration">
+
+            <!-- Right Side: Prominent Hero Illustration -->
+            <div class="hero-right-illustration">
+                <div class="hero-illustration-wrapper animate-float-slow">
+                    <img src="{{ url_for('static', filename='images/hero-illustration.svg') }}" alt="Lost &amp; Found items illustration (Bag, Phone, Wallet, Keys)">
+                </div>
             </div>
         </div>
     </section>
@@ -186,11 +236,70 @@
         // Simple navbar shrink on scroll
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('landingNav');
-            if (window.scrollY > 50) {
+            if (window.scrollY > 40) {
                 nav.classList.add('scrolled');
             } else {
                 nav.classList.remove('scrolled');
             }
+        });
+
+        // Dynamic Typewriter effect for the Liquid Glass Prompt Card
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('glassPromptInput');
+            if (!textarea) return;
+
+            const samplePrompts = [
+                "I lost my Blue Samsung Galaxy S21 near the library entrance...",
+                "Found a set of Honda Civic car keys with a red keychain near Gate B...",
+                "Lost black leather wallet containing student ID at the campus cafeteria...",
+                "Found a Blue HP laptop bag with charger near Seminar Hall Block C...",
+                "Lost brown leather spectacles case in Room 302..."
+            ];
+
+            let promptIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let isFocused = false;
+
+            textarea.addEventListener('focus', () => { isFocused = true; });
+            textarea.addEventListener('blur', () => { 
+                if (textarea.value.trim() === '') {
+                    isFocused = false; 
+                }
+            });
+
+            function typeEffect() {
+                if (isFocused) {
+                    setTimeout(typeEffect, 1000);
+                    return;
+                }
+
+                const currentPrompt = samplePrompts[promptIndex];
+                
+                if (isDeleting) {
+                    textarea.placeholder = currentPrompt.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    textarea.placeholder = currentPrompt.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+
+                let typingSpeed = isDeleting ? 30 : 65;
+
+                if (!isDeleting && charIndex === currentPrompt.length) {
+                    typingSpeed = 2500; // Pause at end of sentence
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    promptIndex = (promptIndex + 1) % samplePrompts.length;
+                    typingSpeed = 500;
+                }
+
+                setTimeout(typeEffect, typingSpeed);
+            }
+
+            // Start typing effect after 1 second
+            setTimeout(typeEffect, 1000);
         });
     </script>
 </body>
