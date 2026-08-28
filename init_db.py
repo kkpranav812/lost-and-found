@@ -36,16 +36,42 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+from urllib.parse import urlparse, unquote
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Direct connection (bypass pool — we need DDL privileges)
 # ─────────────────────────────────────────────────────────────────────────────
 def _connect() -> mysql.connector.MySQLConnection:
+    host = os.environ.get("DB_HOST") or os.environ.get("MYSQLHOST", "localhost")
+    port = int(os.environ.get("DB_PORT") or os.environ.get("MYSQLPORT", "3306"))
+    database = os.environ.get("DB_NAME") or os.environ.get("MYSQLDATABASE", "lost_and_found")
+    user = os.environ.get("DB_USER") or os.environ.get("MYSQLUSER", "root")
+    password = os.environ.get("DB_PASSWORD") or os.environ.get("MYSQLPASSWORD", "")
+
+    # Auto-parse MYSQL_URL / DATABASE_URL if injected by Railway
+    db_url = os.environ.get("MYSQL_URL") or os.environ.get("DATABASE_URL") or os.environ.get("MYSQL_PUBLIC_URL")
+    if db_url and "://" in db_url:
+        try:
+            parsed = urlparse(db_url)
+            if parsed.hostname:
+                host = parsed.hostname
+            if parsed.port:
+                port = parsed.port
+            if parsed.username:
+                user = unquote(parsed.username)
+            if parsed.password:
+                password = unquote(parsed.password)
+            if parsed.path and len(parsed.path) > 1:
+                database = parsed.path.lstrip("/")
+        except Exception as e:
+            logger.warning("Could not parse database URL: %s", e)
+
     config = {
-        "host": os.environ.get("DB_HOST") or os.environ.get("MYSQLHOST", "localhost"),
-        "port": int(os.environ.get("DB_PORT") or os.environ.get("MYSQLPORT", "3306")),
-        "database": os.environ.get("DB_NAME") or os.environ.get("MYSQLDATABASE", "lost_and_found"),
-        "user": os.environ.get("DB_USER") or os.environ.get("MYSQLUSER", "root"),
-        "password": os.environ.get("DB_PASSWORD") or os.environ.get("MYSQLPASSWORD", ""),
+        "host": host,
+        "port": port,
+        "database": database,
+        "user": user,
+        "password": password,
         "connect_timeout": 15,
         "charset": "utf8mb4",
         "collation": "utf8mb4_unicode_ci",

@@ -31,25 +31,12 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration helpers (read from environment variables)
 # ─────────────────────────────────────────────────────────────────────────────
+from urllib.parse import urlparse, unquote
+
 def _build_db_config() -> Dict[str, Any]:
     """
     Build the MySQL connector config dict from environment variables.
     All secrets are read from env so nothing is hardcoded.
-
-    Required env vars:
-        DB_HOST         Aiven service hostname (e.g. mysql-xxx.aivencloud.com)
-        DB_PORT         TCP port (Aiven default: 3306)
-        DB_NAME         Database / schema name
-        DB_USER         MySQL username
-        DB_PASSWORD     MySQL password
-
-    Optional env vars:
-        DB_SSL_CA       Path to CA certificate file (required for Aiven SSL)
-        DB_SSL_CERT     Path to client certificate (optional, mTLS)
-        DB_SSL_KEY      Path to client private key  (optional, mTLS)
-        DB_POOL_SIZE    Number of connections in the pool (default: 5)
-        DB_POOL_TIMEOUT Seconds to wait for a free connection (default: 30)
-        DB_CONNECT_TIMEOUT Seconds for initial TCP connect (default: 10)
     """
     host = os.environ.get("DB_HOST") or os.environ.get("MYSQLHOST", "localhost")
     port = int(os.environ.get("DB_PORT") or os.environ.get("MYSQLPORT", "3306"))
@@ -57,6 +44,24 @@ def _build_db_config() -> Dict[str, Any]:
     user = os.environ.get("DB_USER") or os.environ.get("MYSQLUSER", "root")
     password = os.environ.get("DB_PASSWORD") or os.environ.get("MYSQLPASSWORD", "")
     connect_timeout = int(os.environ.get("DB_CONNECT_TIMEOUT", "10"))
+
+    # Priority 1: Check MYSQL_URL or DATABASE_URL if present
+    db_url = os.environ.get("MYSQL_URL") or os.environ.get("DATABASE_URL") or os.environ.get("MYSQL_PUBLIC_URL")
+    if db_url and "://" in db_url:
+        try:
+            parsed = urlparse(db_url)
+            if parsed.hostname:
+                host = parsed.hostname
+            if parsed.port:
+                port = parsed.port
+            if parsed.username:
+                user = unquote(parsed.username)
+            if parsed.password:
+                password = unquote(parsed.password)
+            if parsed.path and len(parsed.path) > 1:
+                database = parsed.path.lstrip("/")
+        except Exception as e:
+            logger.warning("Could not parse database URL: %s", e)
 
     config: Dict[str, Any] = {
         "host": host,
