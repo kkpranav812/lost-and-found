@@ -524,7 +524,7 @@ DEMO_ITEMS = [
         "longitude": 72.8777,
         "incident_date": (datetime.today() - timedelta(days=2)).date().isoformat(),
         "status": "open",
-        "image_url": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://res.cloudinary.com/ayxjkpvo/image/upload/v1784292342/lnf/demo/tmp9rg_l3ce_xbe0ct.jpg",
     },
     {
         "title": "Car Keys — Honda Civic, red keychain",
@@ -536,7 +536,7 @@ DEMO_ITEMS = [
         "longitude": 72.8800,
         "incident_date": (datetime.today() - timedelta(days=1)).date().isoformat(),
         "status": "open",
-        "image_url": "https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://res.cloudinary.com/ayxjkpvo/image/upload/v1784292340/lnf/demo/tmpwdjso7_c_xwmivo.jpg",
     },
     {
         "title": "Black Leather Wallet",
@@ -548,7 +548,7 @@ DEMO_ITEMS = [
         "longitude": 72.8789,
         "incident_date": (datetime.today() - timedelta(days=3)).date().isoformat(),
         "status": "open",
-        "image_url": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://res.cloudinary.com/ayxjkpvo/image/upload/v1784292338/lnf/demo/tmpdr3q9ojs_oh6ywm.jpg",
     },
     {
         "title": "Blue HP Laptop Bag",
@@ -560,7 +560,7 @@ DEMO_ITEMS = [
         "longitude": 72.8810,
         "incident_date": (datetime.today() - timedelta(days=5)).date().isoformat(),
         "status": "open",
-        "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://res.cloudinary.com/ayxjkpvo/image/upload/v1784292336/lnf/demo/tmpmri95p31_l9p3qr.jpg",
     },
 ]
 
@@ -734,6 +734,11 @@ def main() -> None:
         help="DROP all existing tables before recreating (DESTRUCTIVE)",
     )
     parser.add_argument(
+        "-y", "--yes",
+        action="store_true",
+        help="Bypass confirmation prompt for --drop",
+    )
+    parser.add_argument(
         "--seed",
         action="store_true",
         help="Run seed data only (schema must already exist)",
@@ -754,13 +759,14 @@ def main() -> None:
         cursor = conn.cursor(dictionary=True)
 
         if args.drop:
-            confirm = input(
-                f"⚠  This will DROP all tables in '{os.environ.get('DB_NAME', 'lost_and_found')}'. "
-                "Type 'yes' to confirm: "
-            )
-            if confirm.strip().lower() != "yes":
-                logger.info("Aborted.")
-                return
+            if not args.yes:
+                confirm = input(
+                    f"⚠  This will DROP all tables in '{os.environ.get('DB_NAME', 'lost_and_found')}'. "
+                    "Type 'yes' to confirm: "
+                )
+                if confirm.strip().lower() != "yes":
+                    logger.info("Aborted.")
+                    return
             drop_schema(conn, cursor)
 
         if not args.seed:
