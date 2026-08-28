@@ -51,11 +51,11 @@ def _build_db_config() -> Dict[str, Any]:
         DB_POOL_TIMEOUT Seconds to wait for a free connection (default: 30)
         DB_CONNECT_TIMEOUT Seconds for initial TCP connect (default: 10)
     """
-    host = os.environ.get("DB_HOST", "localhost")
-    port = int(os.environ.get("DB_PORT", "3306"))
-    database = os.environ.get("DB_NAME", "lost_and_found")
-    user = os.environ.get("DB_USER", "root")
-    password = os.environ.get("DB_PASSWORD", "")
+    host = os.environ.get("DB_HOST") or os.environ.get("MYSQLHOST", "localhost")
+    port = int(os.environ.get("DB_PORT") or os.environ.get("MYSQLPORT", "3306"))
+    database = os.environ.get("DB_NAME") or os.environ.get("MYSQLDATABASE", "lost_and_found")
+    user = os.environ.get("DB_USER") or os.environ.get("MYSQLUSER", "root")
+    password = os.environ.get("DB_PASSWORD") or os.environ.get("MYSQLPASSWORD", "")
     connect_timeout = int(os.environ.get("DB_CONNECT_TIMEOUT", "10"))
 
     config: Dict[str, Any] = {

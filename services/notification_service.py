@@ -1,6 +1,5 @@
 from services.db import execute, DatabaseError
 from flask import current_app
-import math
 
 def create_notification(user_id, notif_type, title, body=None, item_id=None, conversation_id=None):
     """
@@ -44,90 +43,3 @@ def notify_new_message(recipient_id, sender_name, conversation_id):
     title = f"New message from {sender_name}"
     body = "You have received a new chat message."
     return create_notification(recipient_id, 'new_message', title, body, conversation_id=conversation_id)
-
-def check_and_notify_matches(new_item_id) -> int:
-    """
-    Scans the database for potential matches for the newly created item.
-    If high-confidence matches are found, it stores them in the item_matches table
-    and notifies both owners. Returns the number of matches found.
-    """
-    from services.db import query_one, query_all
-    
-    # 1. Fetch the details of the new item
-    new_item = query_one("""
-        SELECT id, user_id, title, description, type, category_id, latitude, longitude
-        FROM items WHERE id = %s
-    """, (new_item_id,))
-    if not new_item:
-        return 0
-
-    # 2. Query open candidate items of the opposite type in the same category
-    opposite_type = 'found' if new_item['type'] == 'lost' else 'lost'
-    candidates = query_all("""
-        SELECT id, user_id, title, description, latitude, longitude
-        FROM items
-        WHERE type = %s AND category_id = %s AND status = 'open' AND user_id != %s
-    """, (opposite_type, new_item['category_id'], new_item['user_id']))
-
-    # Helper function to compute word overlap
-    def calculate_score(text1, text2):
-        words1 = set(w for w in text1.lower().split() if len(w) >= 3)
-        words2 = set(w for w in text2.lower().split() if len(w) >= 3)
-        if not words1 or not words2:
-            return 0.0
-        intersection = words1.intersection(words2)
-        return len(intersection) / max(len(words1), len(words2))
-
-    matches_count = 0
-    for candidate in candidates:
-        title_score = calculate_score(new_item['title'], candidate['title'])
-        desc_score = calculate_score(new_item['description'], candidate['description'])
-        score = (title_score * 0.6) + (desc_score * 0.4)
-        
-        # Location proximity scoring bonus (within 500 meters)
-        if (new_item['latitude'] is not None and new_item['longitude'] is not None and 
-            candidate['latitude'] is not None and candidate['longitude'] is not None):
-            try:
-                lat1, lon1 = float(new_item['latitude']), float(new_item['longitude'])
-                lat2, lon2 = float(candidate['latitude']), float(candidate['longitude'])
-                
-                # Haversine formula
-                r_lat1, r_lon1, r_lat2, r_lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-                dlat = r_lat2 - r_lat1
-                dlon = r_lon2 - r_lon1
-                a = math.sin(dlat / 2)**2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(dlon / 2)**2
-                c = 2 * math.asin(math.sqrt(a))
-                dist_meters = 6371000 * c
-                
-                if dist_meters <= 500:
-                    score += 0.25  # Add bonus for close locations
-            except Exception:
-                pass
-        
-        # 0.15 is a reasonable match threshold
-        if score >= 0.15:
-            lost_item_id = new_item['id'] if new_item['type'] == 'lost' else candidate['id']
-            found_item_id = new_item['id'] if new_item['type'] == 'found' else candidate['id']
-            
-            lost_owner_id = new_item['user_id'] if new_item['type'] == 'lost' else candidate['user_id']
-            found_owner_id = new_item['user_id'] if new_item['type'] == 'found' else candidate['user_id']
-            
-            lost_title = new_item['title'] if new_item['type'] == 'lost' else candidate['title']
-            found_title = new_item['title'] if new_item['type'] == 'found' else candidate['title']
-            
-            try:
-                execute("""
-                    INSERT INTO item_matches (lost_item_id, found_item_id, score, notified)
-                    VALUES (%s, %s, %s, 1)
-                    ON DUPLICATE KEY UPDATE score = VALUES(score)
-                """, (lost_item_id, found_item_id, score))
-                
-                # Notify both sides with cross-linked item IDs
-                notify_match_found(lost_owner_id, lost_title, found_title, found_item_id)
-                notify_match_found(found_owner_id, found_title, lost_title, lost_item_id)
-                matches_count += 1
-            except DatabaseError as e:
-                if current_app:
-                    current_app.logger.error(f"Error saving match: {e}")
-                    
-    return matches_count
