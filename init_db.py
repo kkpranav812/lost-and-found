@@ -524,6 +524,7 @@ DEMO_ITEMS = [
         "longitude": 72.8777,
         "incident_date": (datetime.today() - timedelta(days=2)).date().isoformat(),
         "status": "open",
+        "image_url": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80",
     },
     {
         "title": "Car Keys — Honda Civic, red keychain",
@@ -535,6 +536,7 @@ DEMO_ITEMS = [
         "longitude": 72.8800,
         "incident_date": (datetime.today() - timedelta(days=1)).date().isoformat(),
         "status": "open",
+        "image_url": "https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=600&q=80",
     },
     {
         "title": "Black Leather Wallet",
@@ -546,6 +548,7 @@ DEMO_ITEMS = [
         "longitude": 72.8789,
         "incident_date": (datetime.today() - timedelta(days=3)).date().isoformat(),
         "status": "open",
+        "image_url": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=600&q=80",
     },
     {
         "title": "Blue HP Laptop Bag",
@@ -557,6 +560,7 @@ DEMO_ITEMS = [
         "longitude": 72.8810,
         "incident_date": (datetime.today() - timedelta(days=5)).date().isoformat(),
         "status": "open",
+        "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
     },
 ]
 
@@ -707,6 +711,12 @@ def seed_demo_items(conn, cursor, admin_id: int) -> None:
             item["longitude"],
             item["incident_date"],
         ))
+        item_id = cursor.lastrowid
+        if item.get("image_url") and item_id:
+            cursor.execute("""
+                INSERT INTO item_images (item_id, image_url, is_primary, sort_order)
+                VALUES (%s, %s, 1, 0)
+            """, (item_id, item["image_url"]))
         inserted += 1
 
     conn.commit()
