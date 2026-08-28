@@ -88,19 +88,24 @@ def main():
             logger.info("  [%d/%d] Skipping already imported: %s", idx, len(resources), public_id)
             continue
 
-        # Guess title and category from public_id or filename
-        clean_name = public_id.split("/")[-1].replace("_", " ").replace("-", " ").title()
-        if len(clean_name) < 4 or clean_name.isdigit():
-            clean_name = f"Found Item #{idx}"
+        # Format title from folder/filename
+        raw_name = public_id.split("/")[-1].replace("_", " ").replace("-", " ")
+        if public_id.startswith("lnf/"):
+            title = f"Reported Item ({raw_name[:12]})"
+            desc = "Original uploaded item photo recovered from Cloudinary library."
+        elif "sample" in public_id:
+            title = raw_name.title()
+            desc = f"Item matching photo: {raw_name}."
+        else:
+            title = raw_name.title()
+            desc = "Item photo from Cloudinary storage."
 
-        title = f"{clean_name}"
-        desc = "Recovered item photo archived from Cloudinary."
         item_type = "found" if idx % 2 == 0 else "lost"
 
-        # Guess category if mentioned in filename
+        # Guess category from public_id
         selected_cat = default_cat_id
         for cat_name, cat_id in cat_map.items():
-            if cat_name in public_id.lower() or cat_name in clean_name.lower():
+            if cat_name in public_id.lower():
                 selected_cat = cat_id
                 break
 
@@ -119,7 +124,7 @@ def main():
         """, (item_id, image_url, public_id))
 
         imported_count += 1
-        logger.info("  [%d/%d] Imported item '%s' with image %s", idx, len(resources), title, image_url)
+        logger.info("  [%d/%d] Imported item '%s' (Image: %s)", idx, len(resources), title, image_url)
 
     conn.commit()
     cursor.close()
