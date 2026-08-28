@@ -52,14 +52,14 @@ def _connect() -> mysql.connector.MySQLConnection:
         "autocommit": False,
         "use_pure": True,
     }
-    ssl_ca = os.environ.get("DB_SSL_CA", "")
-    if ssl_ca:
+    ssl_ca = os.environ.get("DB_SSL_CA", "").strip()
+    if ssl_ca and os.path.exists(ssl_ca):
         config["ssl_ca"] = ssl_ca
         config["ssl_verify_cert"] = True
         config["ssl_verify_identity"] = True
-        ssl_cert = os.environ.get("DB_SSL_CERT", "")
-        ssl_key = os.environ.get("DB_SSL_KEY", "")
-        if ssl_cert and ssl_key:
+        ssl_cert = os.environ.get("DB_SSL_CERT", "").strip()
+        ssl_key = os.environ.get("DB_SSL_KEY", "").strip()
+        if ssl_cert and ssl_key and os.path.exists(ssl_cert) and os.path.exists(ssl_key):
             config["ssl_cert"] = ssl_cert
             config["ssl_key"] = ssl_key
     return mysql.connector.connect(**config)

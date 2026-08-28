@@ -77,28 +77,25 @@ def _build_db_config() -> Dict[str, Any]:
         "use_pure": True,
     }
 
-    # ── SSL configuration (Aiven always requires SSL) ──────────────────────
-    ssl_ca = os.environ.get("DB_SSL_CA", "")
-    ssl_cert = os.environ.get("DB_SSL_CERT", "")
-    ssl_key = os.environ.get("DB_SSL_KEY", "")
+    # ── SSL configuration (Aiven always requires SSL, Railway doesn't) ────
+    ssl_ca = os.environ.get("DB_SSL_CA", "").strip()
+    ssl_cert = os.environ.get("DB_SSL_CERT", "").strip()
+    ssl_key = os.environ.get("DB_SSL_KEY", "").strip()
 
-    if ssl_ca:
+    if ssl_ca and os.path.exists(ssl_ca):
         # Verify server certificate against the given CA bundle
         config["ssl_ca"] = ssl_ca
         config["ssl_verify_cert"] = True
         config["ssl_verify_identity"] = True
-        if ssl_cert and ssl_key:
+        if ssl_cert and ssl_key and os.path.exists(ssl_cert) and os.path.exists(ssl_key):
             # mTLS — client presents its own certificate
             config["ssl_cert"] = ssl_cert
             config["ssl_key"] = ssl_key
         logger.info("SSL enabled: CA=%s, mTLS=%s", ssl_ca, bool(ssl_cert))
     else:
-        # No CA provided — skip SSL verification.
-        # Railway MySQL does not require SSL certificates.
-        logger.warning(
-            "DB_SSL_CA not set — running without SSL certificate verification. "
-            "This is acceptable for Railway/internal MySQL connections."
-        )
+        # No CA provided or file not found — skip SSL verification.
+        # Railway MySQL internal connections do not require CA files.
+        logger.info("Running without SSL CA certificate (standard for Railway internal MySQL).")
 
     return config
 
